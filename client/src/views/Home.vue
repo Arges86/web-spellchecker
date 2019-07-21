@@ -1,13 +1,13 @@
 <template>
   <div class="home">
     <searchForm  @search:web="searchForText"/>
-    <pageResults :text="text"/>
+    <pageResults :domain="domain" :text="text"/>
     <b-loading :is-full-page="isFullPage" :active.sync="isLoading"></b-loading>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 import searchForm from '../components/searchForm.vue';
 import pageResults from '../components/pageResults.vue';
 
@@ -24,6 +24,7 @@ export default class Home extends Vue {
   private text = {};
   private isFullPage = true;
   private isLoading = false;
+  private domain = '';
 
   created() {
     if (localStorage.getItem('dictionary') === null) {
@@ -44,6 +45,7 @@ export default class Home extends Vue {
     console.log(data);
     this.text = {};
     this.isLoading = true
+    this.domain = this.breakDownURL(data);
 
     const request = {
       params: {
@@ -62,5 +64,25 @@ export default class Home extends Vue {
       console.log(error);
     });
   }
+
+    private breakDownURL(url: string) {
+    let domain = '';
+    // remove 'http://'
+    if (url.indexOf('http://') === 0) {
+        url = url.substr(7);
+    }
+    // remove 'https://'
+    if (url.indexOf('https://') === 0) {
+        url = url.substr(8);
+    }
+    // remove 'www.'
+    if (url.indexOf('www.') === 0) {
+        url = url.substr(4);
+    }
+    domain = url.split('/')[0].split('.')[0];
+
+    return domain;
+  }
+
 }
 </script>

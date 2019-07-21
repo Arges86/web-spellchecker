@@ -12,7 +12,6 @@ router.get('/', function(req, res, next) {
   }); 
   extractor.analyze()
   .then(function(text) {
-    console.log(extractor.title);
     let html = extractor.html
     const urls = html.match((/\bhttps?:\/\/\S+/gi));
 
