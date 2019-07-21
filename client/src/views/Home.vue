@@ -1,7 +1,8 @@
 <template>
   <div class="home">
     <searchForm  @search:web="searchForText"/>
-    <pageResults/>
+    <pageResults :text="text"/>
+    <b-loading :is-full-page="isFullPage" :active.sync="isLoading"></b-loading>
   </div>
 </template>
 
@@ -20,6 +21,10 @@ import {HTTP} from '../services/axios';
 })
 export default class Home extends Vue {
 
+  private text = {};
+  private isFullPage = true;
+  private isLoading = false;
+
   created() {
     if (localStorage.getItem('dictionary') === null) {
       HTTP.get(`dictionary`)
@@ -37,6 +42,8 @@ export default class Home extends Vue {
   
   private searchForText(data:string) {
     console.log(data);
+    this.text = {};
+    this.isLoading = true
 
     const request = {
       params: {
@@ -46,10 +53,12 @@ export default class Home extends Vue {
 
     HTTP.get(`/search`,request)
     .then(response => {
+      this.isLoading = false;
       console.log(response.data);
+      this.text = response.data
     })
-
     .catch(error => {
+      this.isLoading = false;
       console.log(error);
     });
   }

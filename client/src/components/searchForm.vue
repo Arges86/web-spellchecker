@@ -10,10 +10,10 @@
                 v-model="webSite"
                 placeholder="example.com"></b-input>
             </b-field>
-            <a
+            <b-button
               @click="searchWeb" 
-              class="button is-black is-pulled-left"
-              >Search</a>
+              type="is-black is-pulled-left"
+              >Search</b-button>
           </form>
         </div>
       </div>
