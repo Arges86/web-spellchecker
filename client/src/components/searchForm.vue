@@ -3,7 +3,9 @@
       <div class="columns">
         <div class="column is-half">
           <form 
-            v-on:keyup.enter="searchWeb"
+            v-on:keyup.enter="onSubmit"
+            v-on:keyup="validateForm"
+            v-on:paste="validateForm"
             v-on:submit.prevent>
             <b-field label="Website">
               <b-input
@@ -11,10 +13,14 @@
                 placeholder="example.com"></b-input>
             </b-field>
             <b-button
-              @click="searchWeb" 
+              @click="onSubmit" 
               type="is-black is-pulled-left"
+              :disabled="disabled"
               >Search</b-button>
           </form>
+          <div v-if="error" class="error has-text-danger">
+            {{error}}
+          </div>
         </div>
       </div>
   </section>
@@ -22,17 +28,44 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Emit } from 'vue-property-decorator';
+import { mapGetters } from 'vuex';
 
 @Component
 export default class searchForm extends Vue {
 
-  webSite = 'https://arges86.homeserver.com';
+  webSite = ''
+  disabled = true;
+  error = null;
+
+  created(){
+    console.log(this.$store.state.page);
+    this.webSite = this.$store.state.page;
+    this.validateForm();
+  }
 
   @Emit('search:web')
   searchWeb() {
-    console.log(this.webSite);
-    const regEx = /:\/\/(.[^/]+)/;
+    this.$store.state.page = this.webSite;
     return this.webSite;
+  }
+  
+  onSubmit() {
+    const regEx = /:\/\/(.[^/]+)/;
+    console.log(this.webSite.search(regEx));
+     if (this.webSite === '') {
+      this.error = "Please enter a web address."
+      this.disabled = true;
+    } else {
+      this.searchWeb();
+    }
+
+  }
+
+  validateForm() {
+    this.webSite = this.webSite.trim();
+    if (this.webSite) {
+      this.disabled = false;
+    }
   }
 
 }
