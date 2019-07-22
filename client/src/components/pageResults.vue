@@ -53,9 +53,10 @@ export default class pageResults extends Vue {
   private textResult: Array<String>;
   private correctlySpelled = [];
   private isOpen = false;
+  domain = this.$store.state.domain;
 
   @Prop() private text: any;
-  @Prop() private domain: string;
+  // @Prop() private domain: string;
 
   // when 'text' prop is changed
   @Watch("text") TextResults(data: Results) {
