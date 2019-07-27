@@ -1,4 +1,5 @@
 module.exports = {
+    publicPath: "spellcheck",
     configureWebpack: {
       module: {
         rules: [
