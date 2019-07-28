@@ -22,6 +22,11 @@
             {{error}}
           </div>
         </div>
+        <div class="column">
+          Welcome!
+          <p>Simple enter any public web address and click 'Search'.</p>
+          <p>The site will get all the text on the page, and check its spelling.</p>
+        </div>
       </div>
   </section>
 </template>

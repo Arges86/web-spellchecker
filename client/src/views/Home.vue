@@ -47,6 +47,7 @@ export default class Home extends Vue {
     this.isLoading = true
     this.domain = this.breakDownURL(data);
     this.$store.state.domain = this.domain;
+    console.log(this.$store.state.domain);
 
     const request = {
       params: {
