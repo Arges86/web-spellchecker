@@ -9,8 +9,8 @@ web-spellchecker is a VueJs/ExpressJS full stack application for checking the sp
 
 web-spellchecker uses a number of open source projects to work properly:
 
-* [vuejs] - HTML enhanced for web apps!
-* [buefy] - awesome web-based text editor
+* [vuejs] - Front End MVC framework
+* [buefy] - Pure CSS style Library
 * [node.js] - evented I/O for the backend
 * [Express] - fast node.js network app framework
 
