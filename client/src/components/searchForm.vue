@@ -56,14 +56,16 @@ export default class searchForm extends Vue {
   
   onSubmit() {
     const regEx = /:\/\/(.[^/]+)/;
-    console.log(this.webSite.search(regEx));
      if (this.webSite === '') {
       this.error = "Please enter a web address."
       this.disabled = true;
     } else {
+      if (regEx.test(this.webSite)) {
+      } else {
+        this.webSite = `http://${this.webSite}`;
+      }
       this.searchWeb();
     }
-
   }
 
   validateForm() {

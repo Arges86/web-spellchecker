@@ -3,7 +3,12 @@
     <div class="columns">
       <div class="column is-two-fifths">Results for {{domain}}:</div>
     </div>
-    <div class="columns">
+    <div v-if="error" class="columns">
+      <div class="column">
+        <span class="has-text-danger is-size-4"> {{error}} </span>
+      </div>
+    </div>
+    <div v-else class="columns">
       <div class="column is-half">
         <div v-if="misspelled.length > 0" class="results">
           <div v-if="misspelled[0]['passed']" class="has-text-success">{{misspelled[0]['passed']}}</div>
@@ -50,19 +55,21 @@ interface Results {
 export default class pageResults extends Vue {
   private dictionary: Array<String>;
   private misspelled = [];
-  private textResult: Array<String>;
+  private textResult: Array<string | number>;
   private correctlySpelled = [];
   private isOpen = false;
 
   @Prop() private text: any;
   @Prop() private domain: string;
+  @Prop() private error: string;
 
   // @Watch("domain")
 
   // when 'text' prop is changed
   @Watch("text") TextResults(data: Results) {
     console.log(data);
-    this.textResult = data.text;
+    this.textResult = this.uniq(data.text);
+    this.textResult = this.textResult.filter(x => isNaN(x));
     this.misspelled = [];
     this.correctlySpelled = [];
 
@@ -96,6 +103,10 @@ export default class pageResults extends Vue {
   // function to check if word is in dictionary
   inDictionary(arr: Array<string>, val: string): boolean {
     return arr.some(arrVal => val.toLowerCase() === arrVal);
+  }
+
+  uniq(a):Array<string | number> {
+   return Array.from(new Set(a));
   }
 }
 </script>
