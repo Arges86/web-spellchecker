@@ -8,6 +8,7 @@ var cors = require('cors');
 var indexRouter = require('./routes/index');
 var searchRouter = require('./routes/search');
 var dictRouter = require('./routes/dictionary');
+var search2Router = require('./routes/search2');
 
 var app = express();
 
@@ -26,6 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/search', searchRouter);
 app.use('/dictionary', dictRouter);
+app.use('/v2/search', search2Router);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

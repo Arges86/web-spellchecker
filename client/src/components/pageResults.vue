@@ -50,7 +50,7 @@ interface Results {
 export default class pageResults extends Vue {
   private dictionary: Array<String>;
   private misspelled = [];
-  private textResult: Array<String>;
+  private textResult: Array<string | number>;
   private correctlySpelled = [];
   private isOpen = false;
 
@@ -62,7 +62,8 @@ export default class pageResults extends Vue {
   // when 'text' prop is changed
   @Watch("text") TextResults(data: Results) {
     console.log(data);
-    this.textResult = data.text;
+    this.textResult = this.uniq(data.text);
+    this.textResult = this.textResult.filter(x => isNaN(x));
     this.misspelled = [];
     this.correctlySpelled = [];
 
@@ -96,6 +97,10 @@ export default class pageResults extends Vue {
   // function to check if word is in dictionary
   inDictionary(arr: Array<string>, val: string): boolean {
     return arr.some(arrVal => val.toLowerCase() === arrVal);
+  }
+
+  uniq(a):Array<string | number> {
+   return Array.from(new Set(a));
   }
 }
 </script>

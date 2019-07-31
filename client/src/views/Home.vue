@@ -55,7 +55,7 @@ export default class Home extends Vue {
       }
     }
 
-    HTTP.get(`/search`,request)
+    HTTP.get(`/v2/search`,request)
     .then(response => {
       this.isLoading = false;
       console.log(response.data);
