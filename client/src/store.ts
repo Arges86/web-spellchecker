@@ -5,7 +5,16 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-
+    page: '',
+    domain: '',
+  },
+  getters: {
+    getPage(state) {
+      return state.page;
+    },
+    getDomain(state) {
+      return state.domain;
+    },
   },
   mutations: {
 
