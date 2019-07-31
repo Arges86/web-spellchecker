@@ -3,7 +3,12 @@
     <div class="columns">
       <div class="column is-two-fifths">Results for {{domain}}:</div>
     </div>
-    <div class="columns">
+    <div v-if="error" class="columns">
+      <div class="column">
+        <span class="has-text-danger is-size-4"> {{error}} </span>
+      </div>
+    </div>
+    <div v-else class="columns">
       <div class="column is-half">
         <div v-if="misspelled.length > 0" class="results">
           <div v-if="misspelled[0]['passed']" class="has-text-success">{{misspelled[0]['passed']}}</div>
@@ -56,6 +61,7 @@ export default class pageResults extends Vue {
 
   @Prop() private text: any;
   @Prop() private domain: string;
+  @Prop() private error: string;
 
   // @Watch("domain")
 

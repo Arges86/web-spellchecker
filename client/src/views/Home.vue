@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <searchForm  @search:web="searchForText"/>
-    <pageResults :domain="domain" :text="text"/>
+    <pageResults :domain="domain" :text="text" :error="error"/>
     <b-loading :is-full-page="isFullPage" :active.sync="isLoading"></b-loading>
   </div>
 </template>
@@ -25,6 +25,7 @@ export default class Home extends Vue {
   private isFullPage = true;
   private isLoading = false;
   private domain = '';
+  private error = '';
 
   created() {
     if (localStorage.getItem('dictionary') === null) {
@@ -59,11 +60,13 @@ export default class Home extends Vue {
     .then(response => {
       this.isLoading = false;
       console.log(response.data);
+      this.error = null;
       this.text = response.data
     })
     .catch(error => {
       this.isLoading = false;
       console.log(error);
+      this.error = error;
     });
   }
 
