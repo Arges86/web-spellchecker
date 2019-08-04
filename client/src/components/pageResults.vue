@@ -66,22 +66,30 @@ export default class pageResults extends Vue {
   @Prop() private domain: string;
   @Prop() private error: string;
 
-  // @Watch("domain")
+  @Watch("domain")
 
   // when 'text' prop is changed
   @Watch("text") TextResults(data: Results) {
-
-    this.misspelled = [];
-    this.correctlySpelled = [];
-
+    console.log(data);
     if (data.text) {
-      this.dictionary = localStorage.getItem("dictionary").split(",");
-      this.contains(data.text, this.dictionary);
+
+        console.log(this.domain);
+
+        this.misspelled = [];
+        this.correctlySpelled = [];
+
+        if (data.text) {
+          this.dictionary = localStorage.getItem("dictionary").split(",");
+          this.contains(data.text, this.dictionary);
+        }
+
+        console.log(data.links);
+        const links = data.links.filter(x => x.includes(this.domain));
+        console.log(links);
     }
   }
 
   contains(array1, array2) {
-    console.log(array1);
 
     // loop through all words returned from webpage
     for (let i = 0; i < array1.length; i++) {

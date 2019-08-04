@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <searchForm  @search:web="searchForText"/>
+    <searchForm  @search:web="searchForText" @domain:boolean="getChecked"/>
     <pageResults :domain="domain" :text="text" :error="error"/>
     <b-loading :is-full-page="isFullPage" :active.sync="isLoading"></b-loading>
   </div>
@@ -26,6 +26,7 @@ export default class Home extends Vue {
   private isLoading = false;
   private domain = '';
   private error = '';
+  private checked: boolean;
 
   created() {
     if (localStorage.getItem('dictionary') === null) {
@@ -43,6 +44,7 @@ export default class Home extends Vue {
   }
   
   private searchForText(data:string) {
+    console.log(this.checked);
     console.log(data);
     this.text = {};
     this.isLoading = true
@@ -68,6 +70,10 @@ export default class Home extends Vue {
       console.log(error);
       this.error = error;
     });
+  }
+
+  getChecked(data:boolean) {
+    this.checked = data;
   }
 
     private breakDownURL(url: string) {

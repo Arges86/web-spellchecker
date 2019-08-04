@@ -17,6 +17,11 @@
               type="is-black is-pulled-left"
               :disabled="disabled"
               >Search</b-button>
+              <label class="checkbox tooltip">
+                <input type="checkbox" id="checkbox" v-model="checked">
+                Check whole domain?
+                <span class="tooltiptext">Check this to spell check each page on the site.</span>
+              </label>
           </form>
           <div v-if="error" class="error has-text-danger">
             {{error}}
@@ -41,6 +46,7 @@ export default class searchForm extends Vue {
   webSite = ''
   disabled = true;
   error = null;
+  checked = false;
 
   created(){
     console.log(this.$store.state.page);
@@ -51,9 +57,14 @@ export default class searchForm extends Vue {
   @Emit('search:web')
   searchWeb() {
     this.$store.state.page = this.webSite;
+    this.checkDomain();
     return this.webSite;
   }
-  
+
+  @Emit('domain:boolean') checkDomain() {
+    return this.checked;
+  }
+ 
   onSubmit() {
     const regEx = /:\/\/(.[^/]+)/;
      if (this.webSite === '') {
@@ -92,5 +103,31 @@ li {
 }
 a {
   color: #42b983;
+}
+
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: rgba(0, 0, 0, 0.404);
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+ 
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
 </style>
