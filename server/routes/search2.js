@@ -18,9 +18,13 @@ router.get('/', function(req, res, next) {
     rp(options)
     .then(function ($) {
         console.log( $('title').text());
-        let textArray = ($('body').text()).replace(/\W/g, ' ');
-        textArray = textArray.split(' ');
-        textArray = textArray.filter(function(e){return e})
+
+        // removed 
+        let textArray = ($('body').text()).replace(/\W/g, ' '); // removes all non 'word characters'
+        textArray = textArray.split(' '); // splits text into array at space
+        textArray = textArray.filter(function(e){return e}) 
+        textArray = uniq(textArray); // removes any duplicate words
+        textArray = textArray.filter(x => isNaN(x)); // removes any numbers
 
         var urlArray = [];
         $('a').each(function() {
@@ -38,5 +42,9 @@ router.get('/', function(req, res, next) {
     })
 
 });
+
+function uniq(a) {
+    return Array.from(new Set(a));
+}
 
 module.exports = router;

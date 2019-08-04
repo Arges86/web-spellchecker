@@ -5,11 +5,15 @@
     </div>
     <div v-if="error" class="columns">
       <div class="column">
-        <span class="has-text-danger is-size-4"> {{error}} </span>
+        <div class="has-text-danger is-size-4"> {{error}} </div>
+        <div class="has-text-danger">Make sure the webpage exists and please try again.<br>Try changing to the protocol from http to https or visa versa</div>
       </div>
     </div>
-    <div v-else class="columns">
-      <div class="column is-half">
+    <div v-if="text['text']" class="columns">
+      <div v-if="(text['text']).length === 0" class="noText">
+        Could not find any words on this page.
+      </div>
+      <div v-else class="column is-half">
         <div v-if="misspelled.length > 0" class="results">
           <div v-if="misspelled[0]['passed']" class="has-text-success">{{misspelled[0]['passed']}}</div>
           <div v-else>
@@ -55,7 +59,6 @@ interface Results {
 export default class pageResults extends Vue {
   private dictionary: Array<String>;
   private misspelled = [];
-  private textResult: Array<string | number>;
   private correctlySpelled = [];
   private isOpen = false;
 
@@ -67,15 +70,13 @@ export default class pageResults extends Vue {
 
   // when 'text' prop is changed
   @Watch("text") TextResults(data: Results) {
-    console.log(data);
-    this.textResult = this.uniq(data.text);
-    this.textResult = this.textResult.filter(x => isNaN(x));
+
     this.misspelled = [];
     this.correctlySpelled = [];
 
-    if (this.textResult) {
+    if (data.text) {
       this.dictionary = localStorage.getItem("dictionary").split(",");
-      this.contains(this.textResult, this.dictionary);
+      this.contains(data.text, this.dictionary);
     }
   }
 
@@ -105,9 +106,6 @@ export default class pageResults extends Vue {
     return arr.some(arrVal => val.toLowerCase() === arrVal);
   }
 
-  uniq(a):Array<string | number> {
-   return Array.from(new Set(a));
-  }
 }
 </script>
 

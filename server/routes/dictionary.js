@@ -10,7 +10,7 @@ router.get('/', function(req, res, next) {
 
     fs.readFile(filePath, 'utf8'  , function(err, data) {
         if (!err) {
-            var output = data.split('\n');
+            var output = data.split(/\r?\n/);
             res.send(JSON.stringify(output));
         } else {
             console.log(err);
