@@ -18,8 +18,11 @@
     "https": "^1.0.0",
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
-    "nodemon": "^1.19.1",
+    "nodemon": "^1.19.4",
     "path": "^0.12.7",
     "request-promise": "^4.2.4"
+  },
+  "devDependencies": {
+    "eslint": "^6.6.0"
   }
 }

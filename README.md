@@ -46,8 +46,6 @@ For the server I recoomend [pm2](http://pm2.keymetrics.io/docs/usage/quick-start
 
  - Write MORE Tests
  - Add Themes
- - Add domain crawler
- -- The goal is to go to each unique link in the domain (if chosen) and check that page as well
  - Allow as js script to be specified to run before collecting page data
 
 License
