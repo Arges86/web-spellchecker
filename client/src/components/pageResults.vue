@@ -17,7 +17,6 @@
 
     <!-- If page results are returned -->
     <div v-if="results[0]">
-
       <!-- collapse for each page -->
       <b-collapse
         class="card"
@@ -41,23 +40,25 @@
               >Could not find any words on this page.</div>
               <div v-else class="column is-half">
                 <!-- misspelled objects -->
-                <div v-if="collapse.data.spelling.misspelled.length > 0" class="results">
-                  <div
-                    v-if="collapse.data.spelling.misspelled[0]['passed']"
-                    class="has-text-success"
-                  >{{collapse.data.spelling.misspelled[0]['passed']}}</div>
-                  <div v-else>
-                    <div class="title is-3">List of misspelled words</div>
-                    <div class="panel-block">
-                      <ol>
-                        <div
-                          v-for="(error, i) in collapse.data.spelling.misspelled"
-                          :key="i"
-                          class="list"
-                        >
-                          <li class="has-text-danger">{{error}}</li>
-                        </div>
-                      </ol>
+                <div v-if="collapse.data.spelling">
+                  <div v-if="collapse.data.spelling.misspelled.length > 0" class="results">
+                    <div
+                      v-if="collapse.data.spelling.misspelled[0]['passed']"
+                      class="has-text-success"
+                    >{{collapse.data.spelling.misspelled[0]['passed']}}</div>
+                    <div v-else>
+                      <div class="title is-3">List of misspelled words</div>
+                      <div class="panel-block">
+                        <ol>
+                          <div
+                            v-for="(error, i) in collapse.data.spelling.misspelled"
+                            :key="i"
+                            class="list"
+                          >
+                            <li class="has-text-danger">{{error}}</li>
+                          </div>
+                        </ol>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -130,29 +131,16 @@ export default class pageResults extends Vue {
   @Watch("results")
   TextResults(data: [TextReturn]) {
     console.log(data);
-    // if (data.text) {
-
-    //     console.log(this.domain);
-
-    //     this.misspelled = [];
-    //     this.correctlySpelled = [];
-
-    //     if (data.text) {
-    //       this.dictionary = localStorage.getItem("dictionary").split(",");
-    //       this.contains(data.text, this.dictionary);
-    //     }
-
-    //     console.log(data.links);
-    //     const links = data.links.filter(x => x.includes(this.domain));
-    //     console.log(links);
-    // }
 
     if (data[0]) {
       this.dictionary = localStorage.getItem("dictionary").split(",");
 
       for (let i = 0; i < data.length; i++) {
         if (data[i].data) {
-          data[i].data.spelling = this.returnSpelling(data[i].data.text, this.dictionary);
+          data[i].data.spelling = this.returnSpelling(
+            data[i].data.text,
+            this.dictionary
+          );
         }
       }
 

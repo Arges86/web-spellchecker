@@ -1,8 +1,7 @@
 <template>
   <div class="home">
-    <searchForm @search:web="searchForText" @domain:boolean="getChecked" />
+    <searchForm @search:web="searchForText" @domain:boolean="getChecked" :isLoading="isLoading"/>
     <pageResults :domain="domain" :results="text" :error="error" />
-    <b-loading :is-full-page="isFullPage" :active.sync="isLoading"></b-loading>
   </div>
 </template>
 
@@ -21,12 +20,10 @@ import { HTTP } from "../services/axios";
 })
 export default class Home extends Vue {
   private text = []; // whole object getting sent to component
-  private isFullPage = true; // loading boolean
   private isLoading = false; // loading boolean
   private domain = ""; // domain of website being searched
   private error = ""; // if error getting returned
   private checked: boolean; // if check box is check to search whole domain
-  // private URLs = []; // array of all URLs to loop through
   private URLs =  new Set([]);
 
   created() {
@@ -61,7 +58,11 @@ export default class Home extends Vue {
 
     HTTP.get(`/v2/search`, request)
       .then(response => {
-        this.isLoading = false;
+        
+        if (!this.checked) {
+          this.isLoading = false;
+        }
+
         console.log(response.data);
         this.error = null;
         const temp = {
@@ -83,25 +84,86 @@ export default class Home extends Vue {
               // if not already on list
               if (!this.URLs.has(response.data.links[i])) {
                 this.URLs.add(response.data.links[i]);
-                this.text.push({
-                  url: (response.data.links[i]).toUpperCase()
-                });
+                // this.text.push({
+                //   url: (response.data.links[i]).toLowerCase()
+                // });
               }
             }
           }
+          console.log(this.text);
+          console.log(this.URLs.size);
+          this.loopThroughDomain();
+
         }
       })
       .catch(error => {
-        this.isLoading = false;
+        if (!this.checked) {
+          this.isLoading = false;
+        }
         console.log(error);
         this.error = error;
       });
+  }
+
+  // loops through whole domain array
+  loopThroughDomain() {
+    const getText = request => {
+      return new Promise((resolve, reject) => {
+       HTTP.get(`/v2/search`, request)
+          .then(response => {
+            return resolve(response.data);
+          })
+          .catch(error => {
+            return reject(error.response);
+          });
+      });
+    };
+
+    // async loop through webpages
+    const start = async () => {
+
+      // adds loading icon
+      this.isLoading = true;
+
+      // turns set in to an array then loops through it
+      const tempArray = Array.from(this.URLs);
+      for (let i = 0; i < (tempArray).length; i++) {
+
+        const url = tempArray[i];
+        console.log('URL: ', url);
+
+        const request = {
+          params: {
+            site: url
+          }
+        };
+        const check = await getText(request)
+          .then(response => {
+            console.log(response);
+
+            // pushes new data to text array
+            this.text.push({
+              url: url,
+              data: response,
+            });
+          })
+          .catch(_ => {
+            console.log('error ',_);
+          });
+      }
+      console.log("Done");
+      this.isLoading = false;
+    };
+
+    // trigger loop
+    start();
   }
 
   getChecked(data: boolean) {
     this.checked = data;
   }
 
+  // removes protocal and 'www' from URL
   private breakDownURL(url: string) {
     let domain = "";
     // remove 'http://'
