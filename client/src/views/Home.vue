@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <searchForm @search:web="searchForText" @domain:boolean="getChecked" :isLoading="isLoading"/>
+    <searchForm @search:web="searchForText" @domain:boolean="getChecked" :isLoading="isLoading" />
     <pageResults :domain="domain" :results="text" :error="error" />
   </div>
 </template>
@@ -24,70 +24,56 @@ export default class Home extends Vue {
   private text = []; // whole object getting sent to component
   private isLoading = false; // loading boolean
   private domain = ""; // domain of website being searched
-  private error = ""; // if error getting returned
+  private error = []; // if error getting returned
   private checked: boolean; // if check box is check to search whole domain
-  private URLs =  new Set([]);
-  // private ws = new WebSocket(process.env.VUE_WEBSOCKET_API);
+  private URLs = new Set([]);
 
-  created() {
-    if (localStorage.getItem("dictionary") === null) {
-      HTTP.get(`dictionary`)
-        .then(response => {
-          localStorage.setItem("dictionary", response.data);
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    } else {
-      const dict = localStorage.getItem("dictionary");
-      console.log("local dictionary");
-    }
-  }
+  created() {}
 
   private searchForText(data: string) {
     console.log(data);
     this.text = [];
+    this.error = [];
     this.domain = this.breakDownURL(data);
     this.$store.state.domain = this.domain;
     console.log(this.$store.state.domain);
-    this.isLoading = true;
 
     if (this.checked) {
-      console.log('Checking domain...');
+      console.log("Checking domain...");
       if ("WebSocket" in window) {
-            const conn = new WebSocket(process.env.VUE_APP_VUE_WEBSOCKET_API);
+        const conn = new WebSocket(process.env.VUE_APP_VUE_WEBSOCKET_API);
 
-            conn.onopen = function (e) {
-                console.log('connection created');
-                conn.send(JSON.stringify(data));
-            }
+        conn.onopen = function(e) {
+          console.log("connection created");
+          conn.send(JSON.stringify(data));
+        };
 
-            const tempArray = this.text;
-            conn.onmessage = function (event) {
-                // console.log('Message received.');
+        const tempArray = this.text;
+        let wsError = this.error;
+        conn.onmessage = function(event) {
+          // console.log('Message received.');
 
-                const returnObject=JSON.parse(event.data);
-                // console.log(returnObject);
-
-                const temp = {
-                  url: returnObject.url,
-                  data: returnObject
-                };
-                tempArray.push(temp);
-            }
-
-            let loading = this.isLoading;
-            conn.onclose = function() {
-                console.log('Connection Closed');
-                loading = false;
-            }
-
-        } else {
-            console.error('Browser does not support Web Socket');
-        }
-
-    } else {
+          const returnObject = JSON.parse(event.data);
           
+          if (returnObject.Error) {
+            console.log(returnObject.Error);
+            wsError.push(returnObject.Error);
+          } else {
+            const temp = {
+              url: returnObject.url,
+              data: returnObject
+            };
+            tempArray.push(temp);
+          }
+        };
+
+        conn.onclose = function() {
+          console.log("Connection Closed");
+        };
+      } else {
+        console.error("Browser does not support Web Socket");
+      }
+    } else {
       const request = {
         params: {
           site: data
@@ -96,7 +82,6 @@ export default class Home extends Vue {
 
       HTTP.get(`/v2/search`, request)
         .then(response => {
-          
           this.isLoading = false;
 
           console.log(response.data);
@@ -112,13 +97,13 @@ export default class Home extends Vue {
             this.isLoading = false;
           }
           console.log(error);
-          this.error = error;
+          this.error.push(error.message);
         });
     }
   }
 
   getChecked(data: boolean) {
-    console.log('Is Checked ', data);
+    console.log("Is Checked ", data);
     this.checked = data;
   }
 

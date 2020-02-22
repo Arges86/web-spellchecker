@@ -14,7 +14,8 @@ web-spellchecker uses a number of open source projects to work properly:
 * [node.js] - Evented I/O for the backend
 * [Express] - Fast node.js network app framework
 * [cheerio] - An implementation of core jQuery designed specifically for the server.
-* [request-promise] - A simplified HTTP request client 'request' with Promise suppor
+* [request-promise] - A simplified HTTP request client 'request' with Promise support.
+* [ws] - WebSocket client and server implementation.
 
 ### Installation
 
@@ -66,3 +67,4 @@ MIT
    [express]: <http://expressjs.com>
    [cheerio]: <https://www.npmjs.com/package/cheerio>
    [request-promise]: <https://www.npmjs.com/package/request-promise>
+   [ws]: <https://www.npmjs.com/package/ws>

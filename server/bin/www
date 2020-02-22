@@ -6,11 +6,12 @@
 
 const app = require("../app");
 const debug = require("debug")("server:server");
-const https = require("https");
+const https = require("http");
 const fs = require("fs");
 const path = require("path");
 const WebSocket = require("ws");
 const site = require("../commons/webpage");
+const Dictionary = require("../commons/Dictionary");
 
 /**
  * Get port from environment and store in Express.
@@ -36,6 +37,8 @@ server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
 
+// gets all the dictionary values
+const dictionary = new Dictionary();
 
 /**
  * initialize the WebSocket server instance
@@ -47,13 +50,17 @@ wss.on("connection", (ws) => {
  * Connections is up
  */
   ws.on("message", (message) => {
+    message = message.replace(/['"]+/g, "");
     console.log("webpage ",message);
 
-    const id = site.getSite(message)
+    const id = site.getSite(message, dictionary.getDictionary())
       .then(response => {
-        response.url = message.replace(/['"]+/g, "");
+        response.url = message;
         ws.send(JSON.stringify(response));
-        site.getUrl(message, response.links, ws);
+        site.getUrl(message, response.links, ws, dictionary.getDictionary());
+      })
+      .catch(() => {
+        ws.send(JSON.stringify({"Error": "Error resolving page"}));
       });
 
     ws.on("close", () => {

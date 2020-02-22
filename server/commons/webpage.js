@@ -3,7 +3,7 @@ const cheerio = require("cheerio");
 
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
-async function getSite(data) {
+async function getSite(data, dictionary) {
 
   if (data.charAt(0) === "\"") {
     data = data.replace(/['"]+/g, "");
@@ -28,6 +28,17 @@ async function getSite(data) {
       textArray = uniq(textArray); // removes any duplicate words
       textArray = textArray.filter(x => isNaN(x)); // removes any numbers
 
+      //loops through text and spell checks
+      const correct = [], incorrect=[];
+      textArray.forEach(element => {
+        if (inDictionary(dictionary, element)) {
+          correct.push(element);
+        } else {
+          incorrect.push(element);
+        }
+      });
+
+      // creates url
       var urlArray = [];
       $("a").each(function () {
         let uri = $(this).attr("href");
@@ -49,16 +60,26 @@ async function getSite(data) {
 
       const output = {
         text: textArray,
+        incorrect: incorrect,
+        correct: correct,
         links: urlArray,
       };
       return output;
+    })
+    .catch(() => {
+      throw new Error("Failed to resolve page");
     });
 }
 
-async function getUrl(first, data, ws) {
+async function getUrl(first, data, ws, dictionary) {
   // const URLs =  new Set(data);
   let URLs = new Array;
   URLs = data;
+
+  if (data.length === 0) {
+    ws.close();
+    return;
+  }
 
   if (first.charAt(0) === "\"") {
     first = first.replace(/['"]+/g, "");
@@ -71,7 +92,7 @@ async function getUrl(first, data, ws) {
   for (let i = 0; i < URLs.length; i++) {
 
     try {
-      const results = await getSite(URLs[i]);
+      const results = await getSite(URLs[i], dictionary);
 
       // adds URL to outbound results object
       results.url = URLs[i];
@@ -133,7 +154,9 @@ function breakDownURL(url) {
   }
 }
 
-
+function inDictionary(arr, val) {
+  return arr.includes(val.toLowerCase());
+}
 
 module.exports.getSite = getSite;
 module.exports.getUrl = getUrl;

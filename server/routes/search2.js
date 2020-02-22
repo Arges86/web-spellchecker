@@ -2,12 +2,17 @@ var express = require("express");
 var router = express.Router();
 const rp = require("request-promise");
 const cheerio = require("cheerio");
+const Dictionary = require("../commons/Dictionary");
 
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 /* GET search results. */
 router.get("/", function(req, res) {
   console.log(req.query.site);
+
+  // gets all the dictionary values
+  const dict = new Dictionary();
+  const dictionary = dict.getDictionary();
 
   const options = {
     uri: req.query.site,
@@ -25,6 +30,15 @@ router.get("/", function(req, res) {
       textArray = textArray.filter(function(e){return e;}); 
       textArray = uniq(textArray); // removes any duplicate words
       textArray = textArray.filter(x => isNaN(x)); // removes any numbers
+      //loops through text and spell checks
+      const correct = [], incorrect=[];
+      textArray.forEach(element => {
+        if (inDictionary(dictionary, element)) {
+          correct.push(element);
+        } else {
+          incorrect.push(element);
+        }
+      });
 
       var urlArray = [];
       $("a").each(function() {
@@ -39,6 +53,8 @@ router.get("/", function(req, res) {
 
       const output = {
         text: textArray,
+        incorrect: incorrect,
+        correct: correct,
         links: urlArray,
       };
       res.send(output);
@@ -48,6 +64,10 @@ router.get("/", function(req, res) {
     });
 
 });
+
+function inDictionary(arr, val) {
+  return arr.includes(val.toLowerCase());
+}
 
 function uniq(a) {
   return Array.from(new Set(a));
