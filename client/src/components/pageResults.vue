@@ -16,9 +16,9 @@
     </div>
 
     <!-- If page results are returned -->
-    <div v-if="results[0]">
-      <!-- collapse for each page -->
-      <b-collapse
+    <!-- <div v-if="results[0]"> -->
+    <!-- collapse for each page -->
+    <!-- <b-collapse
         class="card"
         v-for="(collapse, index) of results"
         :key="index"
@@ -32,15 +32,15 @@
           </a>
         </div>
         <div class="card-content">
-          <div v-if="collapse.data" class="content">
-            <div v-if="collapse.data.text" class="columns">
+    <div v-if="collapse.data" class="content">-->
+    <!-- <div v-if="collapse.data.text" class="columns">
               <div
                 v-if="collapse.data.text.length === 0"
                 class="noText"
-              >Could not find any words on this page.</div>
-              <div v-else class="column is-half">
-                <!-- misspelled objects -->
-                <div v-if="collapse.data.spelling">
+    >Could not find any words on this page.</div>-->
+    <!-- <div v-else class="column is-half"> -->
+    <!-- misspelled objects -->
+    <!-- <div v-if="collapse.data.spelling">
                   <div v-if="collapse.data.spelling.misspelled.length > 0" class="results">
                     <div
                       v-if="collapse.data.spelling.misspelled[0]['passed']"
@@ -61,11 +61,11 @@
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
+    </div>-->
+    <!-- </div> -->
 
-              <!-- spelled correctly objects -->
-              <div
+    <!-- spelled correctly objects -->
+    <!-- <div
                 v-if="collapse.data.spelling.correctlySpelled.length > 0"
                 class="column is-two-fifths"
               >
@@ -90,6 +90,63 @@
                     </ol>
                   </div>
                 </b-collapse>
+    </div>-->
+    <!-- </div> -->
+    <!-- </div>
+        </div>
+      </b-collapse>
+    </div>-->
+    <div v-if="results[0]">
+      <b-collapse
+        class="card"
+        v-for="(collapse, index) of results"
+        :key="index"
+        :open="isOpen == index"
+        @open="isOpen = index"
+      >
+        <div slot="trigger" slot-scope="props" class="card-header" role="button">
+          <p class="card-header-title">{{ collapse.url }}</p>
+          <a class="card-header-icon">
+            <b-icon :icon="props.open ? 'menu-down' : 'menu-up'"></b-icon>
+          </a>
+        </div>
+        <div class="card-content">
+          <div v-if="collapse.data" class="content">
+            <div v-if="collapse.data.text">
+              <div
+                v-if="collapse.data.text.length === 0"
+                class="noText"
+              >Could not find any words on this page.</div>
+
+              <div v-else class="columns">
+
+                <!-- Mispelled words -->
+                <div class="column is-two-fifths">
+                  <div v-for="(text, i) in collapse.data.text" :key="i" class="list">
+                    <div v-if="!inDictionary(dictionary, text)">
+                      <span class="has-text-danger">{{text}}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Words spelled correctly -->
+                <div class="column is-two-fifths">
+                  <b-collapse class="panel" :open.sync="spelledOpen">
+                  <div slot="trigger" class="panel-heading" role="button">
+                    <strong>Words spelled correctly</strong>
+                  </div>
+                  <div class="panel-block">
+                  <ol>
+                    <div v-for="(text, i) in collapse.data.text" :key="i" class="list">
+                      <div v-if="inDictionary(dictionary, text)">
+                        <li class="has-text-success">{{text}}</li>
+                      </div>
+                    </div>
+                  </ol>
+                  </div>
+                  </b-collapse>
+                </div>
+
               </div>
             </div>
           </div>
@@ -125,79 +182,27 @@ export default class pageResults extends Vue {
   @Prop() private domain: string;
   @Prop() private error: string;
 
-  // @Watch("domain")
-
-  // when 'text' prop is changed
-  @Watch("results")
-  TextResults(data: [TextReturn]) {
-    console.log(data);
-
-    if (data[0]) {
-      this.dictionary = localStorage.getItem("dictionary").split(",");
-
-      for (let i = 0; i < data.length; i++) {
-        if (data[i].data) {
-          data[i].data.spelling = this.returnSpelling(
-            data[i].data.text,
-            this.dictionary
-          );
-        }
-      }
-
-      console.log("After processing: ");
-      console.log(data);
+  created() {
+    console.log("Page Results created");
+    try {
+      this.dictionary = localStorage
+        .getItem("dictionary")
+        .replace(/[\n\r]+/g, "")
+        .split(",");
+    } catch (error) {
+      setTimeout(function() {
+        this.dictionary = localStorage
+          .getItem("dictionary")
+          .replace(/[\n\r]+/g, "")
+          .split(",");
+      }, 3000);
     }
-  }
-
-  contains(array1, array2) {
-    // loop through all words returned from webpage
-    for (let i = 0; i < array1.length; i++) {
-      // if word is not in dictionary, add it to list of misspelled words
-      if (this.inDictionary(array2, array1[i])) {
-        this.correctlySpelled.push(array1[i]);
-      } else {
-        this.misspelled.push(array1[i]);
-      }
-    }
-
-    if (this.misspelled.length === 0) {
-      this.misspelled.push({
-        passed: "There are no misspelled words on this page."
-      });
-      console.log(this.misspelled);
-    }
-  }
-
-  returnSpelling(text, dictionary) {
-    // console.log(text, dictionary);
-    let correctlySpelled = [];
-    let misspelled = [];
-
-    // loop through all words returned from webpage
-    for (let i = 0; i < text.length; i++) {
-      // if word is not in dictionary, add it to list of misspelled words
-      if (this.inDictionary(dictionary, text[i])) {
-        correctlySpelled.push(text[i]);
-      } else {
-        misspelled.push(text[i]);
-      }
-    }
-
-    if (misspelled.length === 0) {
-      misspelled.push({
-        passed: "There are no misspelled words on this page."
-      });
-      console.log(this.misspelled);
-    }
-    return {
-      misspelled: misspelled,
-      correctlySpelled: correctlySpelled
-    };
   }
 
   // function to check if word is in dictionary
   inDictionary(arr: Array<string>, val: string): boolean {
-    return arr.some(arrVal => val.toLowerCase() === arrVal);
+    // return arr.some(arrVal => val.toLowerCase() === arrVal);
+    return arr.includes(val.toLowerCase());
   }
 }
 </script>

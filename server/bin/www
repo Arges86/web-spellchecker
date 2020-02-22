@@ -6,7 +6,7 @@
 
 const app = require("../app");
 const debug = require("debug")("server:server");
-const https = require("http");
+const https = require("https");
 const fs = require("fs");
 const path = require("path");
 const WebSocket = require("ws");
@@ -47,9 +47,11 @@ wss.on("connection", (ws) => {
  * Connections is up
  */
   ws.on("message", (message) => {
+    console.log("webpage ",message);
 
     const id = site.getSite(message)
       .then(response => {
+        response.url = message.replace(/['"]+/g, "");
         ws.send(JSON.stringify(response));
         site.getUrl(message, response.links, ws);
       });
@@ -60,7 +62,7 @@ wss.on("connection", (ws) => {
     });
   });
 
-  ws.send("Hi there, I am a WebSocket server");
+  // ws.send("Hi there, I am a WebSocket server");
 
   ws.on("ping", heartbeat);
 });

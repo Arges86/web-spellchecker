@@ -4,6 +4,11 @@ const cheerio = require("cheerio");
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 async function getSite(data) {
+
+  if (data.charAt(0) === "\"") {
+    data = data.replace(/['"]+/g, "");
+  }
+
   const domain = breakDownURL(data);
 
   const options = {
@@ -54,6 +59,10 @@ async function getUrl(first, data, ws) {
   // const URLs =  new Set(data);
   let URLs = new Array;
   URLs = data;
+
+  if (first.charAt(0) === "\"") {
+    first = first.replace(/['"]+/g, "");
+  }
 
   // gets domain of first URL
   const domain = breakDownURL(first);
