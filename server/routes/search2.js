@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router();
 const rp = require("request-promise");
 const cheerio = require("cheerio");
-const Dictionary = require("../commons/Dictionary");
+const Dictionary = require("../commons/dictionary");
 
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
