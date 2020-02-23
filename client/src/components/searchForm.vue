@@ -1,63 +1,79 @@
 <template>
   <section>
-      <div class="columns">
-        <div class="column is-half">
-          <form 
-            v-on:keyup.enter="onSubmit"
-            v-on:keyup="validateForm"
-            v-on:paste="validateForm"
-            v-on:submit.prevent>
-            <b-field label="Website">
-              <b-input
-                v-model="webSite"
-                placeholder="example.com"></b-input>
-            </b-field>
-            <b-button
-              @click="onSubmit" 
-              type="is-black is-pulled-left"
-              :disabled="disabled"
-              >Search</b-button>
-          </form>
-          <div v-if="error" class="error has-text-danger">
-            {{error}}
-          </div>
-        </div>
-        <div class="column">
-          Welcome!
-          <p>Simple enter any public web address and click 'Search'.</p>
-          <p>The site will get all the text on the page, and check its spelling.</p>
+    <b-loading :is-full-page="false" :active.sync="isLoading"></b-loading>
+    <div class="columns">
+      <div class="column is-half">
+        <form
+          v-on:keyup.enter="onSubmit"
+          v-on:keyup="validateForm"
+          v-on:paste="validateForm"
+          v-on:submit.prevent
+        >
+          <b-field label="Website">
+            <b-input v-model="webSite" placeholder="example.com"></b-input>
+          </b-field>
+          <b-button @click="onSubmit" type="is-black is-pulled-left" :disabled="disabled || isLoading">Search</b-button>
+          <label class="checkbox tooltip">
+            <input type="checkbox" id="checkbox" v-model="checked" />
+            Check whole domain?
+            <span
+              class="tooltiptext"
+            >Check this to spell check each page on the site.</span>
+          </label>
+        </form>
+        <div v-if="error" class="error has-text-danger">{{error}}</div>
+      </div>
+      <div class="column">
+        Welcome!
+        <p>Simple enter any public web address and click 'Search'.</p>
+        <p>The site will get all the text on the page, and check its spelling.</p>
+        <div v-if="checked">
+          <br>
+          <b-message
+            title="Warning"
+            
+            aria-close-label="Close message"
+          >When crawling domain this can take some time. <br> Sit back and relax.</b-message>
         </div>
       </div>
+    </div>
   </section>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Emit } from 'vue-property-decorator';
-import { mapGetters } from 'vuex';
+import { Component, Prop, Vue, Emit } from "vue-property-decorator";
+import { mapGetters } from "vuex";
 
 @Component
 export default class searchForm extends Vue {
+  webSite = ""; // input into search box
+  disabled = true; // enables submit button
+  error = null; // displays input error message
+  checked = false; // value of checkbox
 
-  webSite = ''
-  disabled = true;
-  error = null;
+  @Prop() private isLoading: boolean;
 
-  created(){
+  created() {
     console.log(this.$store.state.page);
     this.webSite = this.$store.state.page;
     this.validateForm();
   }
 
-  @Emit('search:web')
+  @Emit("search:web")
   searchWeb() {
     this.$store.state.page = this.webSite;
+    this.checkDomain();
     return this.webSite;
   }
-  
+
+  @Emit("domain:boolean") checkDomain() {
+    return this.checked;
+  }
+
   onSubmit() {
     const regEx = /:\/\/(.[^/]+)/;
-     if (this.webSite === '') {
-      this.error = "Please enter a web address."
+    if (this.webSite === "") {
+      this.error = "Please enter a web address.";
       this.disabled = true;
     } else {
       if (regEx.test(this.webSite)) {
@@ -74,7 +90,6 @@ export default class searchForm extends Vue {
       this.disabled = false;
     }
   }
-
 }
 </script>
 
@@ -92,5 +107,31 @@ li {
 }
 a {
   color: #42b983;
+}
+
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: rgba(0, 0, 0, 0.404);
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
 </style>

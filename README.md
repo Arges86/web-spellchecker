@@ -14,7 +14,8 @@ web-spellchecker uses a number of open source projects to work properly:
 * [node.js] - Evented I/O for the backend
 * [Express] - Fast node.js network app framework
 * [cheerio] - An implementation of core jQuery designed specifically for the server.
-* [request-promise] - A simplified HTTP request client 'request' with Promise suppor
+* [request-promise] - A simplified HTTP request client 'request' with Promise support.
+* [ws] - WebSocket client and server implementation.
 
 ### Installation
 
@@ -46,8 +47,6 @@ For the server I recoomend [pm2](http://pm2.keymetrics.io/docs/usage/quick-start
 
  - Write MORE Tests
  - Add Themes
- - Add domain crawler
- -- The goal is to go to each unique link in the domain (if chosen) and check that page as well
  - Allow as js script to be specified to run before collecting page data
 
 License
@@ -68,3 +67,4 @@ MIT
    [express]: <http://expressjs.com>
    [cheerio]: <https://www.npmjs.com/package/cheerio>
    [request-promise]: <https://www.npmjs.com/package/request-promise>
+   [ws]: <https://www.npmjs.com/package/ws>

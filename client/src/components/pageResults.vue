@@ -3,42 +3,70 @@
     <div class="columns">
       <div class="column is-two-fifths">Results for {{domain}}:</div>
     </div>
-    <div v-if="error" class="columns">
+
+    <!-- If Error is returned instead of page results -->
+    <div v-if="error[0]" class="columns">
       <div class="column">
-        <span class="has-text-danger is-size-4"> {{error}} </span>
+        <div class="has-text-danger is-size-4">{{error[0]}}</div>
+        <div class="has-text-danger">
+          Make sure the webpage exists and please try again.
+          <br />Try changing to the protocol from http to https or visa versa
+        </div>
       </div>
     </div>
-    <div v-else class="columns">
-      <div class="column is-half">
-        <div v-if="misspelled.length > 0" class="results">
-          <div v-if="misspelled[0]['passed']" class="has-text-success">{{misspelled[0]['passed']}}</div>
-          <div v-else>
-            <div class="title is-3">List of misspelled words</div>
-            <div class="panel-block">
-              <ol>
-                <div v-for="(error, i) in misspelled" :key="i" class="list">
-                  <li class="has-text-danger">{{error}}</li>
+
+    <div v-if="results[0]">
+      <b-collapse
+        class="card"
+        v-for="(collapse, index) of results"
+        :key="index"
+        :open="isOpen == index"
+        @open="isOpen = index"
+      >
+        <div slot="trigger" slot-scope="props" class="card-header" role="button">
+          <p class="card-header-title">{{ collapse.url }}</p>
+          <a class="card-header-icon">
+            <b-icon :icon="props.open ? 'menu-down' : 'menu-up'"></b-icon>
+          </a>
+        </div>
+        <div class="card-content">
+          <div v-if="collapse.data" class="content">
+            <div v-if="collapse.data.text">
+              <div
+                v-if="collapse.data.text.length === 0"
+                class="noText"
+              >Could not find any words on this page.</div>
+
+              <div v-else class="columns">
+
+                <!-- Mispelled words -->
+                <div class="column is-two-fifths">
+                  <div v-for="(text, i) in collapse.data.incorrect" :key="i" class="list">
+                    <span class="has-text-danger">{{text}}</span>
+                  </div>
                 </div>
-              </ol>
+
+                <!-- Words spelled correctly -->
+                <div class="column is-two-fifths">
+                  <b-collapse class="panel" :open.sync="spelledOpen">
+                  <div slot="trigger" class="panel-heading" role="button">
+                    <strong>Words spelled correctly</strong>
+                  </div>
+                  <div class="panel-block">
+                  <ol>
+                    <div v-for="(text, i) in collapse.data.correct" :key="i" class="list">
+                      <li class="has-text-success">{{text}}</li>
+                    </div>
+                  </ol>
+                  </div>
+                  </b-collapse>
+                </div>
+
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <div v-if="correctlySpelled.length > 0" class="column is-two-fifths">
-        <b-collapse aria-id="contentIdForA11y2" class="panel" :open.sync="isOpen">
-          <div slot="trigger" class="panel-heading" role="button" aria-controls="contentIdForA11y2">
-            <strong>Words spelled correctly</strong>
-          </div>
-          <div class="panel-block">
-            <ol>
-              <div v-for="(correct, i) in correctlySpelled" :key="i" class="list">
-                <li class="has-text-success">{{correct}}</li>
-              </div>
-            </ol>
-          </div>
-        </b-collapse>
-      </div>
+      </b-collapse>
     </div>
   </section>
 </template>
@@ -49,65 +77,26 @@ import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 interface Results {
   text: Array<string>;
   links: Array<string>;
+  spelling: any;
+}
+
+interface TextReturn {
+  url: string;
+  data: Results;
 }
 
 @Component
 export default class pageResults extends Vue {
   private dictionary: Array<String>;
   private misspelled = [];
-  private textResult: Array<string | number>;
   private correctlySpelled = [];
-  private isOpen = false;
+  private isOpen = 0;
+  private spelledOpen = false;
 
-  @Prop() private text: any;
+  @Prop() private results: any;
   @Prop() private domain: string;
   @Prop() private error: string;
 
-  // @Watch("domain")
-
-  // when 'text' prop is changed
-  @Watch("text") TextResults(data: Results) {
-    console.log(data);
-    this.textResult = this.uniq(data.text);
-    this.textResult = this.textResult.filter(x => isNaN(x));
-    this.misspelled = [];
-    this.correctlySpelled = [];
-
-    if (this.textResult) {
-      this.dictionary = localStorage.getItem("dictionary").split(",");
-      this.contains(this.textResult, this.dictionary);
-    }
-  }
-
-  contains(array1, array2) {
-    console.log(array1);
-
-    // loop through all words returned from webpage
-    for (let i = 0; i < array1.length; i++) {
-      // if word is not in dictionary, add it to list of misspelled words
-      if (this.inDictionary(array2, array1[i])) {
-        this.correctlySpelled.push(array1[i]);
-      } else {
-        this.misspelled.push(array1[i]);
-      }
-    }
-
-    if (this.misspelled.length === 0) {
-      this.misspelled.push({
-        passed: "There are no misspelled words on this page."
-      });
-      console.log(this.misspelled);
-    }
-  }
-
-  // function to check if word is in dictionary
-  inDictionary(arr: Array<string>, val: string): boolean {
-    return arr.some(arrVal => val.toLowerCase() === arrVal);
-  }
-
-  uniq(a):Array<string | number> {
-   return Array.from(new Set(a));
-  }
 }
 </script>
 
