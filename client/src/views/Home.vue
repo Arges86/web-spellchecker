@@ -12,7 +12,6 @@ import pageResults from "../components/pageResults.vue";
 // import { WebSocket } from 'ws';
 
 import { HTTP } from "../services/axios";
-import { sendws } from "../services/webpages";
 
 @Component({
   components: {
@@ -26,7 +25,6 @@ export default class Home extends Vue {
   private domain = ""; // domain of website being searched
   private error = []; // if error getting returned
   private checked: boolean; // if check box is check to search whole domain
-  private URLs = new Set([]);
 
   created() {}
 
@@ -38,6 +36,7 @@ export default class Home extends Vue {
     this.$store.state.domain = this.domain;
     console.log(this.$store.state.domain);
 
+    // if checking whole domain
     if (this.checked) {
       console.log("Checking domain...");
       if ("WebSocket" in window) {
@@ -73,6 +72,8 @@ export default class Home extends Vue {
       } else {
         console.error("Browser does not support Web Socket");
       }
+
+    // if checking just one page
     } else {
       const request = {
         params: {
@@ -84,13 +85,14 @@ export default class Home extends Vue {
         .then(response => {
           this.isLoading = false;
 
-          console.log(response.data);
+          // console.log(response.data);
           this.error = null;
           const temp = {
             url: data,
             data: response.data
           };
           this.text.push(temp);
+          console.log(this.text);
         })
         .catch(error => {
           if (!this.checked) {
@@ -107,7 +109,11 @@ export default class Home extends Vue {
     this.checked = data;
   }
 
-  // removes protocal and 'www' from URL
+  /**
+   * Strips a URL for just the domain
+   * @param {string} url The web address
+   * @return {string} The domain portion of the url
+   */
   private breakDownURL(url: string) {
     let domain = "";
     // remove 'http://'
