@@ -1,0 +1,18 @@
+version: '3'
+services:
+
+    #backend
+    speller-app:
+        build: ./server
+        container_name: speller-app
+        ports: 
+            - 3000:3000
+    
+    #frontend
+    speller-ui:
+        build: ./client
+        container_name: speller-ui
+        ports: 
+            - 8080:80
+        links: 
+            - speller-app
