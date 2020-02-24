@@ -39,6 +39,7 @@ server.on("listening", onListening);
 
 // gets all the dictionary values
 const dictionary = new Dictionary();
+const words = new Set(dictionary.getDictionary());
 
 /**
  * initialize the WebSocket server instance
@@ -53,11 +54,11 @@ wss.on("connection", (ws) => {
     message = message.replace(/['"]+/g, "");
     console.log("webpage ",message);
 
-    const id = site.getSite(message, dictionary.getDictionary())
+    const id = site.getSite(message, words)
       .then(response => {
         response.url = message;
         ws.send(JSON.stringify(response));
-        site.getUrl(message, response.links, ws, dictionary.getDictionary());
+        site.getUrl(message, response.links, ws, words);
       })
       .catch(() => {
         ws.send(JSON.stringify({"Error": "Error resolving page"}));
