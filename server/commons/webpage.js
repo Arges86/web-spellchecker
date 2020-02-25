@@ -53,7 +53,7 @@ async function getSite(data, dictionary) {
             if (uri.endsWith("/")) {
               uri = uri.substring(0, uri.length - 1);
             }
-            urlArray.push(uri);
+            urlArray.push(uri.toLowerCase().trim());
           }
         }
       });
@@ -72,9 +72,12 @@ async function getSite(data, dictionary) {
 }
 
 async function getUrl(first, data, ws, dictionary) {
-  // const URLs =  new Set(data);
-  let URLs = new Array;
-  URLs = data;
+  const URLs =  new Set(data);
+  // let URLs = new Array;
+  // URLs = data;
+  URLs.delete(first);
+
+  // console.time("loop");
 
   if (data.length === 0) {
     ws.close();
@@ -89,13 +92,16 @@ async function getUrl(first, data, ws, dictionary) {
   const domain = breakDownURL(first);
   console.log(`Domain: ${domain}`);
 
-  for (let i = 0; i < URLs.length; i++) {
+  // for (let i = 0; i < URLs.length; i++) {
+  let i = 0;
+  for (let url of URLs) {
 
+    i++;
     try {
-      const results = await getSite(URLs[i], dictionary);
+      const results = await getSite(url, dictionary);
 
       // adds URL to outbound results object
-      results.url = URLs[i];
+      results.url = url;
 
       // loops through all returned urls
       (results.links).forEach(element => {
@@ -103,8 +109,8 @@ async function getUrl(first, data, ws, dictionary) {
         // if URL is part of the domain
         if (breakDownURL(element) === domain) {
         // if URL is not already on list
-          if (!URLs.includes(element)) {
-            URLs.push(element);
+          if (!URLs.has(element)) {
+            URLs.add(element);
             console.log(`Adding new element: ${element}`);
           }
         }
@@ -118,9 +124,10 @@ async function getUrl(first, data, ws, dictionary) {
 
 
     // if loop is done, close connection
-    console.log(URLs.length, (i + 1));
-    if ((i + 1) === URLs.length) {
+    console.log(URLs.size, i );
+    if (i === URLs.size) {
       console.log("All Done!");
+      // console.timeEnd("loop");
       ws.close();
     }
   }
@@ -130,7 +137,11 @@ function uniq(a) {
   return Array.from(new Set(a));
 }
 
-// removes protocal and 'www' from URL
+/**
+ * Strips a URL for just the domain
+ * @param {string} url The web address
+ * @return {string} The domain portion of the url
+ */
 function breakDownURL(url) {
   // eslint-disable-next-line no-useless-escape
   const http = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
@@ -154,8 +165,8 @@ function breakDownURL(url) {
   }
 }
 
-function inDictionary(arr, val) {
-  return arr.includes(val.toLowerCase());
+function inDictionary(set, val) {
+  return set.has(val.toLowerCase());
 }
 
 module.exports.getSite = getSite;
