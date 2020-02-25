@@ -52,7 +52,10 @@ wss.on("connection", (ws) => {
  */
   ws.on("message", (message) => {
     message = message.replace(/['"]+/g, "");
-    console.log("webpage ",message);
+    if (message.endsWith("/")) {
+      message = message.substring(0, message.length - 1);
+    }
+    console.log("webpage: ",message);
 
     const id = site.getSite(message, words)
       .then(response => {

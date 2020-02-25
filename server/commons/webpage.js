@@ -53,7 +53,7 @@ async function getSite(data, dictionary) {
             if (uri.endsWith("/")) {
               uri = uri.substring(0, uri.length - 1);
             }
-            urlArray.push(uri);
+            urlArray.push(uri.toLowerCase().trim());
           }
         }
       });
@@ -75,10 +75,9 @@ async function getUrl(first, data, ws, dictionary) {
   const URLs =  new Set(data);
   // let URLs = new Array;
   // URLs = data;
+  URLs.delete(first);
 
-  console.log(typeof dictionary);
-
-  console.time("loop");
+  // console.time("loop");
 
   if (data.length === 0) {
     ws.close();
@@ -128,7 +127,7 @@ async function getUrl(first, data, ws, dictionary) {
     console.log(URLs.size, i );
     if (i === URLs.size) {
       console.log("All Done!");
-      console.timeEnd("loop");
+      // console.timeEnd("loop");
       ws.close();
     }
   }
@@ -138,7 +137,11 @@ function uniq(a) {
   return Array.from(new Set(a));
 }
 
-// removes protocal and 'www' from URL
+/**
+ * Strips a URL for just the domain
+ * @param {string} url The web address
+ * @return {string} The domain portion of the url
+ */
 function breakDownURL(url) {
   // eslint-disable-next-line no-useless-escape
   const http = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
@@ -163,7 +166,6 @@ function breakDownURL(url) {
 }
 
 function inDictionary(set, val) {
-  // return arr.includes(val.toLowerCase());
   return set.has(val.toLowerCase());
 }
 
