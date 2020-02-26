@@ -18,9 +18,11 @@ async function getSite(data, dictionary) {
     }
   };
 
+  const start = process.hrtime.bigint();
   return rp(options)
     .then($ => {
       console.log($("title").text());
+      var end = process.hrtime.bigint();
 
       let textArray = ($("body").text()).replace(/\W/g, " "); // removes all non 'word characters'
       textArray = textArray.split(" "); // splits text into array at space
@@ -58,11 +60,15 @@ async function getSite(data, dictionary) {
         }
       });
 
+      // gets the number of seconds of elapsed time
+      const seconds = ((Number(end - start)) / 1000000000).toFixed(3);
+
       const output = {
         text: textArray,
         incorrect: incorrect,
         correct: correct,
         links: urlArray,
+        time: `${seconds} seconds`,
       };
       return output;
     })
@@ -98,10 +104,16 @@ async function getUrl(first, data, ws, dictionary) {
 
     i++;
     try {
+
+      // const start = process.hrtime.bigint();
       const results = await getSite(url, dictionary);
+      // var end = process.hrtime.bigint();
 
       // adds URL to outbound results object
       results.url = url;
+
+      // const seconds = ((Number(end - start)) / 1000000000).toFixed(3);
+      // results.time = `${seconds} seconds`;
 
       // loops through all returned urls
       (results.links).forEach(element => {
