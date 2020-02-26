@@ -18,6 +18,13 @@
     </div>
 
     <div v-if="results !== null">
+      <div class="card-header">
+        <p class="card-header-title">
+          URL:
+          <span class="time">Elapsed Time</span>
+          <span class="ratio">Mispelled Ratio</span>
+        </p>
+      </div>
       <div v-if="results[0]">
         <b-collapse
           class="card"
@@ -29,6 +36,9 @@
           <div slot="trigger" slot-scope="props" class="card-header" role="button">
             <p class="card-header-title">
               {{ collapse.url }}
+              <span class="time">
+                {{collapse.data.time}}
+              </span>
               <span class="ratio">
                 <span class="has-text-danger">{{(collapse.data.incorrect).length}}</span> /
                 <span class="has-text-success">{{(collapse.data.correct).length}}</span>
@@ -117,6 +127,13 @@ ol {
   @media only screen and (max-width: 1215px) {
     position: absolute;
     right: 0px;
+  }
+}
+.time {
+  position: absolute;
+  right: 25%;
+  @media only screen and (max-width: 1215px) {
+    visibility: hidden;
   }
 }
 </style>
