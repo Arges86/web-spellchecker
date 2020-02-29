@@ -26,6 +26,7 @@ async function getSite(data, dictionary) {
   console.log($("title").text());
   const end = process.hrtime.bigint();
 
+  // cleans up the array of text
   let textArray = ($("body").text()).replace(/\W/g, " "); // removes all non 'word characters'
   textArray = textArray.split(" "); // splits text into array at space
   textArray = textArray.filter(function (e) { return e; });
@@ -57,8 +58,27 @@ async function getSite(data, dictionary) {
         if (uri.endsWith("/")) {
           uri = uri.substring(0, uri.length - 1);
         }
-        urlArray.push(uri.toLowerCase().trim());
+
+        uri = uri.toLowerCase().trim();
+
+        urlArray.push(relativeToAbsolute(data, uri));
       }
+    }
+  });
+
+  // creates image
+  const imgArray = [];
+  $("img").each(function () {
+    let image = $(this).attr("src");
+    let image2 = $(this).attr("data-src");
+    
+    if (image) {
+      image = relativeToAbsolute(data, image);
+      imgArray.push(image);
+    }
+    if (image2) {
+      image2 = relativeToAbsolute(data, image2);
+      imgArray.push(image2);
     }
   });
 
@@ -70,6 +90,7 @@ async function getSite(data, dictionary) {
     incorrect: incorrect,
     correct: correct,
     links: urlArray,
+    images: imgArray,
     time: `${seconds} seconds`,
   };
   return output;
@@ -96,22 +117,16 @@ async function getUrl(first, data, ws, dictionary) {
   const domain = breakDownURL(first);
   console.log(`Domain: ${domain}`);
 
-  // for (let i = 0; i < URLs.length; i++) {
   let i = 0;
   for (let url of URLs) {
 
     i++;
     try {
 
-      // const start = process.hrtime.bigint();
       const results = await getSite(url, dictionary);
-      // var end = process.hrtime.bigint();
 
       // adds URL to outbound results object
       results.url = url;
-
-      // const seconds = ((Number(end - start)) / 1000000000).toFixed(3);
-      // results.time = `${seconds} seconds`;
 
       // loops through all returned urls
       (results.links).forEach(element => {
@@ -177,6 +192,11 @@ function breakDownURL(url) {
 
 function inDictionary(set, val) {
   return set.has(val.toLowerCase());
+}
+
+function relativeToAbsolute(base, relative) {
+
+  return new URL(relative, base).href;
 }
 
 module.exports.getSite = getSite;

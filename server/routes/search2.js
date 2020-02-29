@@ -18,7 +18,8 @@ router.get("/", async function(req, res) {
     const output = await site.getSite(req.query.site, words);
     res.send(output);
   } catch (error) {
-    res.status(500).send({Error: "Error rendering page"});
+    console.log(error);
+    res.status(500).send({"Error": "Error rendering page"});
   }
  
 });
