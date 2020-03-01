@@ -69,6 +69,7 @@ wss.on("connection", (ws) => {
 
     ws.on("close", () => {
       console.log("stopping client interval");
+      ws.close();
       clearInterval(id);
     });
   });
