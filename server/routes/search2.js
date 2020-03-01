@@ -8,7 +8,6 @@ process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 /* GET search results. */
 router.get("/", async function(req, res) {
-  console.log(req.query.site);
 
   // gets all the dictionary values
   const dictionary = new Dictionary();

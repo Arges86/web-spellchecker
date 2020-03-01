@@ -20,8 +20,20 @@ async function getSite(data, dictionary) {
   } catch (error) {
     throw new Error("Failed to resolve page");
   }
+
+  if (html.headers["content-type"]) {
+    if (!(html.headers["content-type"]).includes("text/html")) {
+      throw new Error("Its not a website!!");
+    }
+  }
+
+  // if the page was re-directed, set that new url as the current
+  if (html.request.res.responseUrl) {
+    data = html.request.res.responseUrl;
+  }
   
-  const $ = await cheerio.load(html.data);
+  
+  const $ = cheerio.load(html.data);
 
   console.log($("title").text());
   const end = process.hrtime.bigint();
@@ -69,17 +81,19 @@ async function getSite(data, dictionary) {
   // creates image
   const imgArray = [];
   $("img").each(function () {
-    let image = $(this).attr("src");
-    let image2 = $(this).attr("data-src");
+    let image = $(this).attr("src"); // <= normal image links
+    let dataImage = $(this).attr("data-src"); // <= lazy loaded images from frameworks
     
     if (image) {
       image = relativeToAbsolute(data, image);
       imgArray.push(image);
     }
-    if (image2) {
-      image2 = relativeToAbsolute(data, image2);
-      imgArray.push(image2);
+
+    if (dataImage) {
+      dataImage = relativeToAbsolute(data, dataImage);
+      imgArray.push(dataImage);
     }
+
   });
 
   // gets the number of seconds of elapsed time
@@ -184,7 +198,7 @@ function breakDownURL(url) {
     if (url.indexOf("www.") === 0) {
       url = url.substr(4);
     }
-    domain = url.split("/")[0].split(".")[0];
+    domain = url.split(/[/?#]/)[0].split(".")[0];
 
     return domain;
   }
@@ -194,7 +208,13 @@ function inDictionary(set, val) {
   return set.has(val.toLowerCase());
 }
 
+/**
+ * Takes the initial URL for the page, and the relative url fragment and makes a full resource
+ * @param {string} base the initial URL for this page's web scraping
+ * @param {string} relative the (maybe) relative url 
+ */
 function relativeToAbsolute(base, relative) {
+  base = new URL(base).origin;
 
   return new URL(relative, base).href;
 }

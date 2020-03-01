@@ -89,20 +89,20 @@
                 </div>
               </div>
               <div v-if="collapse.data.images" class="pictures">
-                <b-collapse class="panel" :open.sync="imageOpen">
+                <b-collapse v-if="collapse.data.images.length !== 0" class="panel" :open.sync="imageOpen">
                   <div slot="trigger" class="panel-heading" role="button">
                     <strong>Images:</strong>
                   </div>
                   <div class="panel-block">
                     <div class="columns is-multiline">
                       <div
-                        class="column"
+                        class=""
                         v-for="(image, i) in collapse.data.images"
                         :key="image + i"
                       >
                         <!-- Image Card -->
-                        <div class="card">
-                          <div class="card-image">
+                        <div class="card" style="margin: 5px;">
+                          <div class="card-image has-background-grey-lighter">
                             <figure class="image is-96x96">
                               <img :src="image" alt="Image Not Found!"/>
                             </figure>
