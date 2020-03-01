@@ -2,7 +2,7 @@
 
 web-spellchecker is a VueJs/ExpressJS full stack application for checking the spelling of any webpage.
   - Enter web address
-  -- Must be publicaly accessable
+  -- Must be publicaly accessable (unless your running the whole service yourself)
   - See list of words and if they are in the dictionary
 
 ### Tech
@@ -14,10 +14,16 @@ web-spellchecker uses a number of open source projects to work properly:
 * [node.js] - Evented I/O for the backend
 * [Express] - Fast node.js network app framework
 * [cheerio] - An implementation of core jQuery designed specifically for the server.
-* [request-promise] - A simplified HTTP request client 'request' with Promise support.
+* [axios] - Promise based HTTP client for the browser and node.js.
 * [ws] - WebSocket client and server implementation.
 
-### Installation
+### Installation Docker
+From the root project directory:
+```
+docker-compose build
+```
+
+### Installation Native
 
 web-spellchecker requires [Node.js](https://nodejs.org/) v10+ to run.
 
@@ -41,7 +47,7 @@ $ cd web-spellchecker/client
 $ npm run build
 ```
 
-For the server I recoomend [pm2](http://pm2.keymetrics.io/docs/usage/quick-start/)
+For the server I recomend [pm2](http://pm2.keymetrics.io/docs/usage/quick-start/)
 
 ### Todos
 
@@ -66,5 +72,5 @@ MIT
    [node.js]: <http://nodejs.org>
    [express]: <http://expressjs.com>
    [cheerio]: <https://www.npmjs.com/package/cheerio>
-   [request-promise]: <https://www.npmjs.com/package/request-promise>
+   [axios]: <https://www.npmjs.com/package/axios>
    [ws]: <https://www.npmjs.com/package/ws>
