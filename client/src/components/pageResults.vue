@@ -18,6 +18,13 @@
     </div>
 
     <div v-if="results !== null">
+      <div class="card-header">
+        <p class="card-header-title">
+          URL:
+          <span class="time">Elapsed Time</span>
+          <span class="ratio">Mispelled Ratio</span>
+        </p>
+      </div>
       <div v-if="results[0]">
         <b-collapse
           class="card"
@@ -29,6 +36,7 @@
           <div slot="trigger" slot-scope="props" class="card-header" role="button">
             <p class="card-header-title">
               {{ collapse.url }}
+              <span class="time">{{collapse.data.time}}</span>
               <span class="ratio">
                 <span class="has-text-danger">{{(collapse.data.incorrect).length}}</span> /
                 <span class="has-text-success">{{(collapse.data.correct).length}}</span>
@@ -49,9 +57,18 @@
                 <div v-else class="columns">
                   <!-- Mispelled words -->
                   <div class="column is-two-fifths">
-                    <div v-for="(text, i) in collapse.data.incorrect" :key="i" class="list">
-                      <span class="has-text-danger">{{text}}</span>
-                    </div>
+                    <b-collapse class="panel" :open.sync="missSpelledOpen">
+                      <div slot="trigger" class="panel-heading" role="button">
+                        <strong>Words spelled incorrectly</strong>
+                      </div>
+                      <div class="panel-block">
+                        <ol>
+                          <div v-for="(text, i) in collapse.data.incorrect" :key="i" class="list">
+                            <li class="has-text-danger">{{text}}</li>
+                          </div>
+                        </ol>
+                      </div>
+                    </b-collapse>
                   </div>
 
                   <!-- Words spelled correctly -->
@@ -70,6 +87,36 @@
                     </b-collapse>
                   </div>
                 </div>
+              </div>
+              <div v-if="collapse.data.images" class="pictures">
+                <b-collapse v-if="collapse.data.images.length !== 0" class="panel" :open.sync="imageOpen">
+                  <div slot="trigger" class="panel-heading" role="button">
+                    <strong>Images:</strong>
+                  </div>
+                  <div class="panel-block">
+                    <div class="columns is-multiline">
+                      <div
+                        class=""
+                        v-for="(image, i) in collapse.data.images"
+                        :key="image + i"
+                      >
+                        <!-- Image Card -->
+                        <div class="card" style="margin: 5px;">
+                          <div class="card-image has-background-grey-lighter">
+                            <figure class="image is-96x96">
+                              <img :src="image" alt="Image Not Found!"/>
+                            </figure>
+                          </div>
+                          <div class="card-content">
+                            <div class="content">
+                              <a :href="image" target="_blank" rel="noopener noreferrer">URL</a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </b-collapse>
               </div>
             </div>
           </div>
@@ -100,6 +147,8 @@ export default class pageResults extends Vue {
   private correctlySpelled = [];
   private isOpen = 0;
   private spelledOpen = false;
+  private missSpelledOpen = false;
+  private imageOpen = false;
 
   @Prop() private results: any;
   @Prop() private domain: string;
@@ -118,5 +167,16 @@ ol {
     position: absolute;
     right: 0px;
   }
+}
+.time {
+  position: absolute;
+  right: 25%;
+  @media only screen and (max-width: 1215px) {
+    visibility: hidden;
+  }
+}
+
+.pictures {
+  max-width: 85%;
 }
 </style>

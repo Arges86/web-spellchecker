@@ -39,6 +39,7 @@ server.on("listening", onListening);
 
 // gets all the dictionary values
 const dictionary = new Dictionary();
+const words = new Set(dictionary.getDictionary());
 
 /**
  * initialize the WebSocket server instance
@@ -51,13 +52,16 @@ wss.on("connection", (ws) => {
  */
   ws.on("message", (message) => {
     message = message.replace(/['"]+/g, "");
-    console.log("webpage ",message);
+    if (message.endsWith("/")) {
+      message = message.substring(0, message.length - 1);
+    }
+    console.log("webpage: ",message);
 
-    const id = site.getSite(message, dictionary.getDictionary())
+    const id = site.getSite(message, words)
       .then(response => {
         response.url = message;
         ws.send(JSON.stringify(response));
-        site.getUrl(message, response.links, ws, dictionary.getDictionary());
+        site.getUrl(message, response.links, ws, words);
       })
       .catch(() => {
         ws.send(JSON.stringify({"Error": "Error resolving page"}));
@@ -65,6 +69,7 @@ wss.on("connection", (ws) => {
 
     ws.on("close", () => {
       console.log("stopping client interval");
+      ws.close();
       clearInterval(id);
     });
   });
