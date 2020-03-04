@@ -10,11 +10,11 @@
           v-on:submit.prevent
         >
           <b-field label="Website">
-            <b-input v-model="webSite" placeholder="example.com"></b-input>
+            <b-input v-model="webSite" placeholder="https://example.com"></b-input>
           </b-field>
-          <b-button @click="onSubmit" type="is-black is-rounded is-pulled-left" :disabled="disabled || isLoading">Search &nbsp;&nbsp;</b-button>
-          <b-button @click="stopSearch" type="is-primary is-pulled-left is-rounded" style="left: -27px;">Stop &nbsp;&nbsp;</b-button>
-          <b-button @click="clearPage" type="is-warning is-pulled-left is-rounded" style="left: -52px;">Clear</b-button>
+          <b-button rounded @click="onSubmit" type="is-black is-pulled-left" :disabled="disabled || isLoading">Search &nbsp;&nbsp;</b-button>
+          <b-button v-if="checked" rounded @click="stopSearch" type="is-primary is-pulled-left" style="left: -1.7rem">Stop &nbsp;&nbsp;</b-button>
+          <b-button rounded @click="clearPage" type="is-warning is-pulled-left" :class="checked ? 'lot' : 'little'">Clear</b-button>
           <label class="checkbox tooltip">
             <input type="checkbox" id="checkbox" v-model="checked" />
             Check whole domain?
@@ -118,6 +118,14 @@ li {
 }
 a {
   color: #42b983;
+}
+
+.lot {
+  left: -3.2rem;
+}
+
+.little {
+  left: -1.7rem;
 }
 
 /* Tooltip container */
