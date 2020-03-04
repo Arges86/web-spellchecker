@@ -132,6 +132,7 @@ async function getUrl(first, data, ws, dictionary) {
   console.log(`Domain: ${domain}`);
 
   let i = 0;
+  let loop = false;
   for (let url of URLs) {
 
     i++;
@@ -169,6 +170,15 @@ async function getUrl(first, data, ws, dictionary) {
       // console.timeEnd("loop");
       ws.close();
     }
+
+    if (loop) {
+      break;
+    }
+
+    ws.on("close", () => {
+      loop = true;
+      ws.close();
+    });
   }
 }
 

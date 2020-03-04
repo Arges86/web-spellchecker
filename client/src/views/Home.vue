@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <searchForm @search:web="searchForText" @domain:boolean="getChecked" :isLoading="isLoading" />
+    <searchForm @search:web="searchForText" @search:clear="clearPage" @domain:boolean="getChecked" :isLoading="isLoading" />
     <pageResults :domain="domain" :results="text" :error="error" />
   </div>
 </template>
@@ -25,8 +25,11 @@ export default class Home extends Vue {
   private domain = ""; // domain of website being searched
   private error = []; // if error getting returned
   private checked: boolean; // if check box is check to search whole domain
+  private conn = new WebSocket(process.env.VUE_APP_VUE_WEBSOCKET_API);
 
-  created() {}
+  created() {
+    localStorage.setItem("webSocketStop", "false");
+  }
 
   private searchForText(data: string) {
     console.log(data);
@@ -49,6 +52,7 @@ export default class Home extends Vue {
 
         const tempArray = this.text;
         let wsError = this.error;
+        localStorage.setItem("webSocketStop", "false");
         conn.onmessage = function(event) {
           // console.log('Message received.');
 
@@ -64,11 +68,20 @@ export default class Home extends Vue {
             };
             tempArray.push(temp);
           }
+
+          // if value for webSocketStop is 'true' then close connection
+          const value = localStorage.getItem("webSocketStop");
+          if (value == "true") {
+            conn.close();
+          }
+
         };
 
         conn.onclose = function() {
           console.log("Connection Closed");
         };
+
+
       } else {
         console.error("Browser does not support Web Socket");
       }
@@ -102,6 +115,18 @@ export default class Home extends Vue {
           this.error.push(error.message);
         });
     }
+  }
+
+  checkStatus(conn) {
+    if (this.$store.state.stop) {
+      console.log("Stopping search ", this.$store.state.stop);
+      conn.close();
+    }
+  }
+
+  clearPage(){
+    this.text = [];
+    this.error = [];
   }
 
   getChecked(data: boolean) {
