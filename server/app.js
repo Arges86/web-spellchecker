@@ -5,7 +5,7 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var cors = require("cors");
 
-var indexRouter = require("./routes/index");
+// var indexRouter = require("./routes/index");
 var searchRouter = require("./routes/search");
 var dictRouter = require("./routes/dictionary");
 var search2Router = require("./routes/search2");
@@ -22,9 +22,10 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
+// app.use(express.static(path.join(__dirname, "public")));
+app.use("/", express.static(path.join(__dirname, "public/dist")));
 
-app.use("/", indexRouter);
+// app.use("/", indexRouter);
 app.use("/search", searchRouter);
 app.use("/dictionary", dictRouter);
 app.use("/v2/search", search2Router);
