@@ -12,8 +12,8 @@
           <b-field label="Website">
             <b-input v-model="webSite" placeholder="https://example.com"></b-input>
           </b-field>
-          <b-button rounded @click="onSubmit" type="is-black is-pulled-left" :disabled="disabled || isLoading">Search &nbsp;&nbsp;</b-button>
-          <b-button v-if="checked" rounded @click="stopSearch" type="is-primary is-pulled-left" style="left: -1.7rem">Stop &nbsp;&nbsp;</b-button>
+          <b-button rounded @click="onSubmit" type="is-black is-pulled-left" :disabled="disabled || isLoading">Search </b-button>
+          <b-button v-if="checked" rounded @click="stopSearch" type="is-primary is-pulled-left" style="left: -1.7rem">Stop </b-button>
           <b-button rounded @click="clearPage" type="is-warning is-pulled-left" :class="checked ? 'lot' : 'little'">Clear</b-button>
           <label class="checkbox tooltip">
             <input type="checkbox" id="checkbox" v-model="checked" />
@@ -121,11 +121,11 @@ a {
 }
 
 .lot {
-  left: -3.2rem;
+  left: -2.8rem;
 }
 
 .little {
-  left: -1.7rem;
+  left: -1.2rem;
 }
 
 /* Tooltip container */
