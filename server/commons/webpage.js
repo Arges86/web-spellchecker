@@ -1,4 +1,3 @@
-// const rp = require("request-promise");
 const cheerio = require("cheerio");
 const axios = require("axios");
 
@@ -13,7 +12,7 @@ async function getSite(data, dictionary) {
   const domain = breakDownURL(data);
 
   const start = process.hrtime.bigint();
-  
+
   let html;
   try {
     html = await axios.get(data);
@@ -31,9 +30,10 @@ async function getSite(data, dictionary) {
   if (html.request.res.responseUrl) {
     data = html.request.res.responseUrl;
   }
-  
-  
-  const $ = cheerio.load(html.data);
+
+  let htmlData = html.data.replace(/>/g, "> ");
+
+  const $ = cheerio.load(htmlData);
 
   console.log($("title").text());
   const end = process.hrtime.bigint();
@@ -46,7 +46,7 @@ async function getSite(data, dictionary) {
   textArray = textArray.filter(x => isNaN(x)); // removes any numbers
 
   //loops through text and spell checks
-  const correct = [], incorrect=[];
+  const correct = [], incorrect = [];
   textArray.forEach(element => {
     if (inDictionary(dictionary, element)) {
       correct.push(element);
@@ -83,7 +83,7 @@ async function getSite(data, dictionary) {
   $("img").each(function () {
     let image = $(this).attr("src"); // <= normal image links
     let dataImage = $(this).attr("data-src"); // <= lazy loaded images from frameworks
-    
+
     if (image) {
       image = relativeToAbsolute(data, image);
       imgArray.push(image);
@@ -111,7 +111,7 @@ async function getSite(data, dictionary) {
 }
 
 async function getUrl(first, data, ws, dictionary) {
-  const URLs =  new Set(data);
+  const URLs = new Set(data);
   // let URLs = new Array;
   // URLs = data;
   URLs.delete(first);
@@ -148,7 +148,7 @@ async function getUrl(first, data, ws, dictionary) {
 
         // if URL is part of the domain
         if (breakDownURL(element) === domain) {
-        // if URL is not already on list
+          // if URL is not already on list
           if (!URLs.has(element)) {
             URLs.add(element);
             console.log(`Adding new element: ${element}`);
@@ -164,7 +164,7 @@ async function getUrl(first, data, ws, dictionary) {
 
 
     // if loop is done, close connection
-    console.log(URLs.size, i );
+    console.log(URLs.size, i);
     if (i === URLs.size) {
       console.log("All Done!");
       // console.timeEnd("loop");

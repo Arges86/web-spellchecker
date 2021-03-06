@@ -12,9 +12,11 @@
           <b-field label="Website">
             <b-input v-model="webSite" placeholder="https://example.com"></b-input>
           </b-field>
-          <b-button rounded @click="onSubmit" type="is-black is-pulled-left" :disabled="disabled || isLoading">Search </b-button>
-          <b-button v-if="checked" rounded @click="stopSearch" type="is-primary is-pulled-left" style="left: -1.7rem">Stop </b-button>
-          <b-button rounded @click="clearPage" type="is-warning is-pulled-left" :class="checked ? 'lot' : 'little'">Clear</b-button>
+          <div class="buttons has-addons">
+            <b-button rounded @click="onSubmit" type="is-black" :disabled="disabled || isLoading">Search </b-button>
+            <b-button v-if="checked" rounded @click="stopSearch" type="is-primary">Stop </b-button>
+            <b-button rounded @click="clearPage" type="is-warning">Clear</b-button>
+          </div>
           <label class="checkbox tooltip">
             <input type="checkbox" id="checkbox" v-model="checked" />
             Check whole domain?
