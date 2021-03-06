@@ -37,7 +37,7 @@ $ npm run serve
 
 $ cd web-spellchecker/server
 $ npm install
-$ npm nodemon
+$ npm run start:dev
 ```
 
 For production environments...

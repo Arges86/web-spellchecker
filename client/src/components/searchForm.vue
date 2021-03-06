@@ -10,9 +10,13 @@
           v-on:submit.prevent
         >
           <b-field label="Website">
-            <b-input v-model="webSite" placeholder="example.com"></b-input>
+            <b-input v-model="webSite" placeholder="https://example.com"></b-input>
           </b-field>
-          <b-button @click="onSubmit" type="is-black is-pulled-left" :disabled="disabled || isLoading">Search</b-button>
+          <div class="buttons has-addons">
+            <b-button rounded @click="onSubmit" type="is-black" :disabled="disabled || isLoading">Search </b-button>
+            <b-button v-if="checked" rounded @click="stopSearch" type="is-primary">Stop </b-button>
+            <b-button rounded @click="clearPage" type="is-warning">Clear</b-button>
+          </div>
           <label class="checkbox tooltip">
             <input type="checkbox" id="checkbox" v-model="checked" />
             Check whole domain?
@@ -70,6 +74,11 @@ export default class searchForm extends Vue {
     return this.checked;
   }
 
+  @Emit("search:clear")
+  clearPage(){
+    return true;
+  }
+
   onSubmit() {
     const regEx = /:\/\/(.[^/]+)/;
     if (this.webSite === "") {
@@ -82,6 +91,10 @@ export default class searchForm extends Vue {
       }
       this.searchWeb();
     }
+  }
+
+  stopSearch() {
+    localStorage.setItem("webSocketStop", "true");
   }
 
   validateForm() {
@@ -107,6 +120,14 @@ li {
 }
 a {
   color: #42b983;
+}
+
+.lot {
+  left: -2.8rem;
+}
+
+.little {
+  left: -1.2rem;
 }
 
 /* Tooltip container */

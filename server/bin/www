@@ -57,7 +57,7 @@ wss.on("connection", (ws) => {
     }
     console.log("webpage: ",message);
 
-    const id = site.getSite(message, words)
+    site.getSite(message, words)
       .then(response => {
         response.url = message;
         ws.send(JSON.stringify(response));
@@ -67,11 +67,11 @@ wss.on("connection", (ws) => {
         ws.send(JSON.stringify({"Error": "Error resolving page"}));
       });
 
-    ws.on("close", () => {
-      console.log("stopping client interval");
-      ws.close();
-      clearInterval(id);
-    });
+    // ws.on("close", () => {
+    //   console.log("stopping client interval");
+    //   ws.close();
+    //   clearInterval(id);
+    // });
   });
 
   // ws.send("Hi there, I am a WebSocket server");

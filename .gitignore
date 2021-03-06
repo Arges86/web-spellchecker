@@ -23,3 +23,5 @@ yarn-error.log*
 
 server/bin/server.key
 server/bin/server.crt
+
+server/public/dist

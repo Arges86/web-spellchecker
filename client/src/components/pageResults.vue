@@ -35,7 +35,7 @@
         >
           <div slot="trigger" slot-scope="props" class="card-header" role="button">
             <p class="card-header-title">
-              {{ collapse.url }}
+              <span class="url"> {{ collapse.url }}</span>
               <span class="time">{{collapse.data.time}}</span>
               <span class="ratio">
                 <span class="has-text-danger">{{(collapse.data.incorrect).length}}</span> /
@@ -162,7 +162,7 @@ ol {
 }
 .ratio {
   position: absolute;
-  left: 50%;
+  left: 65%;
   @media only screen and (max-width: 1215px) {
     position: absolute;
     right: 0px;
@@ -170,7 +170,7 @@ ol {
 }
 .time {
   position: absolute;
-  right: 25%;
+  right: 10%;
   @media only screen and (max-width: 1215px) {
     visibility: hidden;
   }
@@ -178,5 +178,11 @@ ol {
 
 .pictures {
   max-width: 85%;
+}
+.url {
+  max-width: 65%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
