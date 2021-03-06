@@ -46,8 +46,21 @@ For production environments...
 $ cd web-spellchecker/client
 $ npm run build
 ```
-
 For the server I recomend [pm2](http://pm2.keymetrics.io/docs/usage/quick-start/)
+
+### Build for Heroku
+run the `build.ps1` script. This will build the vuejs frontend, and copy it to the `server/public` folder for deployment.   
+Then switch to the server folder and initialize that folder as new repo (first time only) and push the code changes to heroku's remote repo.   
+```sh
+.\build.ps1
+cd server
+heroku login
+git init
+git remote add heroku https://git.heroku.com/domain-crawler.git
+git add .
+git commit -am "New Release"
+git push heroku master
+```
 
 ### Todos
 
