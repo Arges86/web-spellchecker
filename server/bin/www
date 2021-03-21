@@ -7,8 +7,6 @@
 const app = require("../app");
 const debug = require("debug")("server:server");
 const https = require("http");
-const fs = require("fs");
-const path = require("path");
 const WebSocket = require("ws");
 const site = require("../commons/webpage");
 const Dictionary = require("../commons/dictionary");
@@ -24,10 +22,7 @@ app.set("port", port);
  * Create HTTPS server.
  */
 
-const server = https.createServer({
-  key: fs.readFileSync(path.join(__dirname, "server.key")),
-  cert: fs.readFileSync(path.join(__dirname, "server.crt"))
-}, app);
+const server = https.createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.

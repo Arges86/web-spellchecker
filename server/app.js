@@ -1,16 +1,17 @@
-var createError = require("http-errors");
-var express = require("express");
-var path = require("path");
-var cookieParser = require("cookie-parser");
-var logger = require("morgan");
-var cors = require("cors");
+const createError = require("http-errors");
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
+const cors = require("cors");
 
-// var indexRouter = require("./routes/index");
-var searchRouter = require("./routes/search");
-var dictRouter = require("./routes/dictionary");
-var search2Router = require("./routes/search2");
+// const indexRouter = require("./routes/index");
+const searchRouter = require("./routes/search");
+const dictRouter = require("./routes/dictionary");
+const search2Router = require("./routes/search2");
+const search3Router = require("./routes/search3");
 
-var app = express();
+const app = express();
 
 app.use(cors());
 
@@ -29,6 +30,7 @@ app.use("/", express.static(path.join(__dirname, "public/dist")));
 app.use("/search", searchRouter);
 app.use("/dictionary", dictRouter);
 app.use("/v2/search", search2Router);
+app.use("/v3/search", search3Router);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

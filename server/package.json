@@ -22,6 +22,7 @@
     "http-errors": "^1.8.0",
     "https": "^1.0.0",
     "morgan": "^1.10.0",
+    "nodehun": "^3.0.2",
     "path": "^0.12.7",
     "pug": "^3.0.0",
     "request-promise": "^4.2.5",
