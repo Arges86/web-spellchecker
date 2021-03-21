@@ -27,17 +27,19 @@ async function getSite(site, dictionary) {
   if (site.charAt(0) === "\"") {
     site = site.replace(/['"]+/g, "");
   }
-    
-  const domain = breakDownURL(site);
+
   const start = process.hrtime.bigint();
     
   const html = await getHtml(site);
 
-  const page = await getPageText(html);
+  let htmlData = html.data.replace(/>/g, "> ");  
+  const $ = cheerio.load(htmlData);
+
+  const pageText = getPageText($);
   const end = process.hrtime.bigint();
 
   const correct = [], incorrect = [];
-  page.forEach(element => {
+  pageText.forEach(element => {
     if (nodehun.spellSync(element)) {
       correct.push(element);
     } else {
@@ -47,17 +49,25 @@ async function getSite(site, dictionary) {
 
   // gets the number of seconds of elapsed time
   const seconds = ((Number(end - start)) / 1000000000).toFixed(3);
+  const links = getUrls(site, $);
+  const images = getImages(site, $);
+
   return {
-    text: page,
+    text: pageText,
     incorrect: incorrect,
     correct: correct,
-    links: null,
-    images: null,
+    links: links,
+    images: images,
     time: `${seconds} seconds`,
   };
 
 }
 
+/**
+ * removes duplicate values from array
+ * @param {string[]} a List of words to filter
+ * @returns {string[]}
+ */
 function uniq(a) {
   return Array.from(new Set(a));
 }
@@ -101,11 +111,12 @@ function relativeToAbsolute(base, relative) {
   return new URL(relative, base).href;
 }
 
-async function getPageText(html) {
-    
-  let htmlData = html.data.replace(/>/g, "> ");
-    
-  const $ = cheerio.load(htmlData);
+/**
+ * Returns all of the words on the wepage
+ * @param {string} $ cheerio page object
+ * @returns {string[]} Array of text
+ */
+function getPageText($) {
     
   console.log($("title").text());
     
@@ -114,15 +125,15 @@ async function getPageText(html) {
   textArray = ($("body").text()).replace(/\W/g, " "); // removes all non 'word characters'
   textArray = textArray.split(" "); // splits text into array at space
   textArray = textArray.filter(function (e) { return e; });
-  textArray = uniq(textArray); // removes any duplicate words
+  textArray = uniq(textArray);
   textArray = textArray.filter(x => isNaN(x)); // removes any numbers
   return textArray;
 }
 
 /**
- * Gets raw HTML from url
+ * Gets axios object
  * @param {string} site URL of webpage 
- * @returns 
+ * @returns {Promise<object>} raw HTML data from site
  */
 async function getHtml(site) {
   let html;
@@ -143,6 +154,66 @@ async function getHtml(site) {
     site = html.request.res.responseUrl;
   }
   return html;
+}
+
+/**
+ * returns list of all URLs on webpage
+ * @param {string} site URL of webpage
+ * @param {object} $ cheerio page object
+ * @returns {Array<string>}
+ */
+function getUrls(site, $) {
+
+  const domain = breakDownURL(site);
+  const urlArray = [];
+
+  $("a").each(function () {
+    let uri = $(this).attr("href");
+
+    if (uri === undefined || uri === null) {
+      // do nothing
+    } else {
+
+      // if url is part of the domain
+      if (breakDownURL(uri) === domain) {
+        // if URI ends with with a backslash, remove it
+        if (uri.endsWith("/")) {
+          uri = uri.substring(0, uri.length - 1);
+        }
+
+        uri = uri.toLowerCase().trim();
+
+        urlArray.push(relativeToAbsolute(site, uri));
+      }
+    }
+  });
+  return urlArray;
+}
+
+/**
+ * returns list of all images on webpage
+ * @param {string} site URL of webpage 
+ * @param {object} $ cheerio page object
+ * @returns {Array<string>}
+ */
+function getImages(site, $) {
+  const imgArray = [];
+  $("img").each(function () {
+    let image = $(this).attr("src"); // <= normal image links
+    let dataImage = $(this).attr("data-src"); // <= lazy loaded images from frameworks
+
+    if (image) {
+      image = relativeToAbsolute(site, image);
+      imgArray.push(image);
+    }
+
+    if (dataImage) {
+      dataImage = relativeToAbsolute(site, dataImage);
+      imgArray.push(dataImage);
+    }
+
+  });
+  return imgArray;
 }
 
 module.exports.getSite = getSite;
