@@ -1,6 +1,26 @@
 <template>
   <div class="home">
-    <searchForm @search:web="searchForText" @search:clear="clearPage" @domain:boolean="getChecked" :isLoading="isLoading" />
+    <div class="columns">
+      <div class="column is-half">
+        Select dictionary language:
+        <select v-model="selected" class="select">
+          <option :disabled="true">Pick Language</option>
+          <option
+            v-for="option in list"
+            v-bind:value="option.value"
+            :key="option.value"
+          >
+            {{ option.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <searchForm
+      @search:web="searchForText"
+      @search:clear="clearPage"
+      @domain:boolean="getChecked"
+      :isLoading="isLoading"
+    />
     <pageResults :domain="domain" :results="text" :error="error" />
   </div>
 </template>
@@ -13,11 +33,16 @@ import pageResults from "../components/pageResults.vue";
 
 import { HTTP } from "../services/axios";
 
+interface lang {
+  name: string;
+  value: string;
+}
+
 @Component({
   components: {
     searchForm,
-    pageResults
-  }
+    pageResults,
+  },
 })
 export default class Home extends Vue {
   private text = []; // whole object getting sent to component
@@ -25,13 +50,16 @@ export default class Home extends Vue {
   private domain = ""; // domain of website being searched
   private error = []; // if error getting returned
   private checked: boolean; // if check box is check to search whole domain
-  private conn = new WebSocket(process.env.VUE_APP_VUE_WEBSOCKET_API);
+  conn = new WebSocket(process.env.VUE_APP_VUE_WEBSOCKET_API);
+  list: lang[] = []; // list of dictionaries to use
+  selected = null; // which dictionary language to use
 
   created() {
     localStorage.setItem("webSocketStop", "false");
+    this.getDictionaries();
   }
 
-  private searchForText(data: string) {
+  searchForText(data: string) {
     console.log(data);
     this.text = [];
     this.error = [];
@@ -45,7 +73,7 @@ export default class Home extends Vue {
       if ("WebSocket" in window) {
         const conn = new WebSocket(process.env.VUE_APP_VUE_WEBSOCKET_API);
 
-        conn.onopen = function(e) {
+        conn.onopen = function (e) {
           console.log("connection created");
           conn.send(JSON.stringify(data));
         };
@@ -53,18 +81,18 @@ export default class Home extends Vue {
         const tempArray = this.text;
         let wsError = this.error;
         localStorage.setItem("webSocketStop", "false");
-        conn.onmessage = function(event) {
+        conn.onmessage = function (event) {
           // console.log('Message received.');
 
           const returnObject = JSON.parse(event.data);
-          
+
           if (returnObject.Error) {
             console.log(returnObject.Error);
             wsError.push(returnObject.Error);
           } else {
             const temp = {
               url: returnObject.url,
-              data: returnObject
+              data: returnObject,
             };
             tempArray.push(temp);
           }
@@ -74,40 +102,38 @@ export default class Home extends Vue {
           if (value == "true") {
             conn.close();
           }
-
         };
 
-        conn.onclose = function() {
+        conn.onclose = function () {
           console.log("Connection Closed");
         };
-
-
       } else {
         console.error("Browser does not support Web Socket");
       }
 
-    // if checking just one page
+      // if checking just one page
     } else {
       const request = {
         params: {
-          site: data
-        }
+          site: data,
+          dictionary: this.selected,
+        },
       };
 
-      HTTP.get(`/v2/search`, request)
-        .then(response => {
+      HTTP.get(`/v3/search`, request)
+        .then((response) => {
           this.isLoading = false;
 
           // console.log(response.data);
           this.error = null;
           const temp = {
             url: data,
-            data: response.data
+            data: response.data,
           };
           this.text.push(temp);
           console.log(this.text);
         })
-        .catch(error => {
+        .catch((error) => {
           if (!this.checked) {
             this.isLoading = false;
           }
@@ -117,6 +143,13 @@ export default class Home extends Vue {
     }
   }
 
+  /** Get list of dictionary languages */
+  private async getDictionaries() {
+    this.list = await HTTP.get("languages").then((resp) => resp.data);
+    const filtered = this.list.filter((x) => x.value === navigator.language);
+    this.selected = filtered[0].value;
+  }
+
   checkStatus(conn) {
     if (this.$store.state.stop) {
       console.log("Stopping search ", this.$store.state.stop);
@@ -124,7 +157,7 @@ export default class Home extends Vue {
     }
   }
 
-  clearPage(){
+  clearPage() {
     this.text = [];
     this.error = [];
   }
@@ -139,7 +172,7 @@ export default class Home extends Vue {
    * @param {string} url The web address
    * @return {string} The domain portion of the url
    */
-  private breakDownURL(url: string) {
+  private breakDownURL(url: string): string {
     let domain = "";
     // remove 'http://'
     if (url.indexOf("http://") === 0) {

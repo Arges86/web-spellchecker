@@ -14,11 +14,17 @@ async function getSite(site, dictionary) {
 
   let nodehun =  null;
   switch(dictionary) {
-  case "en-us":
+  case "en-US":
     nodehun = new Nodehun(dictionaries.en_US.affix, dictionaries.en_US.dictionary);
     break;
-  case "en-ca":
+  case "en-CA":
     nodehun = new Nodehun(dictionaries.en_CA.affix, dictionaries.en_CA.dictionary);
+    break;
+  case "en-GB":
+    nodehun = new Nodehun(dictionaries.en_GB.affix, dictionaries.en_GB.dictionary);
+    break;
+  case "es":
+    nodehun = new Nodehun(dictionaries.es.affix, dictionaries.es.dictionary);
     break;
   default:
     throw new Error("Unsupported dictionary format");

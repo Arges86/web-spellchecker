@@ -10,6 +10,7 @@ const searchRouter = require("./routes/search");
 const dictRouter = require("./routes/dictionary");
 const search2Router = require("./routes/search2");
 const search3Router = require("./routes/search3");
+const languages = require("./routes/languages");
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use("/search", searchRouter);
 app.use("/dictionary", dictRouter);
 app.use("/v2/search", search2Router);
 app.use("/v3/search", search3Router);
+app.use("/languages", languages);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
