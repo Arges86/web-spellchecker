@@ -20,7 +20,52 @@ router.get("/", function (req, res) {
   {
     name: "Spanish (or Castilian)",
     value: "es"
+  },
+  {
+    name: "Bulgarian",
+    value: "bg"
+  },
+  {
+    name: "Czech",
+    value: "cs"
+  },
+  {
+    name: "Danish",
+    value: "da"
+  },
+  {
+    name: "German",
+    value: "de"
+  },
+  {
+    name: "Modern Greek",
+    value: "el"
+  },
+  {
+    name: "French",
+    value: "fr"
+  },
+  {
+    name: "Italian",
+    value: "it"
+  },
+  {
+    name: "Russian",
+    value: "ru"
   }];
+
+  list.sort((a, b) => {
+    let fa = a.name.toLowerCase();
+    let fb = b.name.toLowerCase();
+
+    if (fa < fb) {
+      return -1;
+    }
+    if (fa > fb) {
+      return 1;
+    }
+    return 0;
+  });
   res.json(list);
 
 });

@@ -5,6 +5,9 @@ const dictionaries = require("../files/dictionaries");
 
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
+const languages = Object.keys(dictionaries);
+console.log(languages);
+
 /**
  * 
  * @param {string} site URL of webpage to search 
@@ -12,23 +15,13 @@ process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
  */
 async function getSite(site, dictionary) {
 
-  let nodehun =  null;
-  switch(dictionary) {
-  case "en-US":
-    nodehun = new Nodehun(dictionaries.en_US.affix, dictionaries.en_US.dictionary);
-    break;
-  case "en-CA":
-    nodehun = new Nodehun(dictionaries.en_CA.affix, dictionaries.en_CA.dictionary);
-    break;
-  case "en-GB":
-    nodehun = new Nodehun(dictionaries.en_GB.affix, dictionaries.en_GB.dictionary);
-    break;
-  case "es":
-    nodehun = new Nodehun(dictionaries.es.affix, dictionaries.es.dictionary);
-    break;
-  default:
+  console.log(languages.includes(dictionary));
+
+  // if language isn't in list, throw error
+  if (!languages.includes(dictionary)) {
     throw new Error("Unsupported dictionary format");
   }
+  const nodehun = new Nodehun(dictionaries[dictionary].affix, dictionaries[dictionary].dictionary);
 
   if (site.charAt(0) === "\"") {
     site = site.replace(/['"]+/g, "");
