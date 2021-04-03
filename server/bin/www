@@ -3,38 +3,29 @@
 /**
  * Module dependencies.
  */
-
 const app = require("../app");
 const debug = require("debug")("server:server");
 const https = require("http");
 const WebSocket = require("ws");
-const site = require("../commons/webpage");
-const Dictionary = require("../commons/dictionary");
+const hunspell = require("../commons/hunspell");
 
 /**
  * Get port from environment and store in Express.
  */
-
 const port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);
 
 /**
  * Create HTTPS server.
  */
-
 const server = https.createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
-
 server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
-
-// gets all the dictionary values
-const dictionary = new Dictionary();
-const words = new Set(dictionary.getDictionary());
 
 /**
  * initialize the WebSocket server instance
@@ -46,30 +37,25 @@ wss.on("connection", (ws) => {
  * Connections is up
  */
   ws.on("message", (message) => {
-    message = message.replace(/['"]+/g, "");
-    if (message.endsWith("/")) {
-      message = message.substring(0, message.length - 1);
+    message = JSON.parse(message);
+  
+    let site = message.site;
+    const dictionary = message.dictionary;
+    site = site.replace(/['"]+/g, "");
+    if (site.endsWith("/")) {
+      site = message.substring(0, site.length - 1);
     }
-    console.log("webpage: ",message);
 
-    site.getSite(message, words)
+    hunspell.getSite(site, dictionary)
       .then(response => {
-        response.url = message;
+        response.url = site;
         ws.send(JSON.stringify(response));
-        site.getUrl(message, response.links, ws, words);
+        hunspell.getUrl(site, response.links, ws, dictionary);
       })
       .catch(() => {
         ws.send(JSON.stringify({"Error": "Error resolving page"}));
       });
-
-    // ws.on("close", () => {
-    //   console.log("stopping client interval");
-    //   ws.close();
-    //   clearInterval(id);
-    // });
   });
-
-  // ws.send("Hi there, I am a WebSocket server");
 
   ws.on("ping", heartbeat);
 });
@@ -84,7 +70,6 @@ function heartbeat() {
 /**
  * Normalize a port into a number, string, or false.
  */
-
 function normalizePort(val) {
   const port = parseInt(val, 10);
 
@@ -104,7 +89,6 @@ function normalizePort(val) {
 /**
  * Event listener for HTTP server "error" event.
  */
-
 function onError(error) {
   if (error.syscall !== "listen") {
     throw error;
@@ -132,7 +116,6 @@ function onError(error) {
 /**
  * Event listener for HTTP server "listening" event.
  */
-
 function onListening() {
   const addr = server.address();
   const bind = typeof addr === "string"

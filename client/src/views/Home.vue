@@ -73,9 +73,14 @@ export default class Home extends Vue {
       if ("WebSocket" in window) {
         const conn = new WebSocket(process.env.VUE_APP_VUE_WEBSOCKET_API);
 
+        const params = {
+          site: data,
+          dictionary: this.selected,
+        }
+
         conn.onopen = function (e) {
           console.log("connection created");
-          conn.send(JSON.stringify(data));
+          conn.send(JSON.stringify(params));
         };
 
         const tempArray = this.text;

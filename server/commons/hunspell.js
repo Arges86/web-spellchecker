@@ -124,8 +124,6 @@ function relativeToAbsolute(base, relative) {
  */
 function getPageText($) {
     
-  console.log($("title").text());
-    
   // cleans up the array of text
   let textArray = [];
   textArray = ($("body").text()).replace(/\W/g, " "); // removes all non 'word characters'
@@ -222,4 +220,84 @@ function getImages(site, $) {
   return imgArray;
 }
 
+/**
+ * Loops through list and send websocket response for each instance
+ * @param {string} first List of the first domain
+ * @param {Array<string>} data List of all domains
+ * @param {WebSocket} ws Websocket instance 
+ * @param {string} dictionary Which dictionary to use
+ * @returns 
+ */
+async function getUrl(first, data, ws, dictionary) {
+  const URLs = new Set(data);
+  // let URLs = new Array;
+  // URLs = data;
+  URLs.delete(first);
+
+  // console.time("loop");
+
+  if (data.length === 0) {
+    ws.close();
+    return;
+  }
+
+  if (first.charAt(0) === "\"") {
+    first = first.replace(/['"]+/g, "");
+  }
+
+  // gets domain of first URL
+  const domain = breakDownURL(first);
+  // console.log(`Domain: ${domain}`);
+
+  let i = 0;
+  let loop = false;
+  for (let url of URLs) {
+
+    i++;
+    try {
+
+      const results = await getSite(url, dictionary);
+
+      // adds URL to outbound results object
+      results.url = url;
+
+      // loops through all returned urls
+      (results.links).forEach(element => {
+
+        // if URL is part of the domain
+        if (breakDownURL(element) === domain) {
+          // if URL is not already on list
+          if (!URLs.has(element)) {
+            URLs.add(element);
+            // console.log(`Adding new element: ${element}`);
+          }
+        }
+      });
+
+      ws.send(JSON.stringify(results));
+
+    } catch (error) {
+      console.log(error);
+    }
+
+
+    // if loop is done, close connection
+    if (i === URLs.size) {
+      console.log("All Done!");
+      // console.timeEnd("loop");
+      ws.close();
+    }
+
+    if (loop) {
+      break;
+    }
+
+    ws.on("close", () => {
+      loop = true;
+      ws.close();
+    });
+  }
+}
+
 module.exports.getSite = getSite;
+module.exports.getUrl = getUrl;
