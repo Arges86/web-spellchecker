@@ -7,15 +7,15 @@ router.get("/", function (req, res) {
   // const list = ["en-US", "en-CA"];
   const list = [{
     name: "English (US)",
-    value: "en_US"
+    value: "en-US"
   },
   {
     name: "English (CA)",
-    value: "en_CA"
+    value: "en-CA"
   },
   {
     name: "English (United Kingdom)",
-    value: "en_GB"
+    value: "en-GB"
   },
   {
     name: "Spanish (or Castilian)",
