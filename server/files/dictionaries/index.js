@@ -2,15 +2,15 @@ const fs = require("fs");
 const path = require("path");
 
 module.exports = {
-  en_US: {
+  "en-US": {
     affix: fs.readFileSync(path.resolve(__dirname, "./en_US.aff")),
     dictionary: fs.readFileSync(path.resolve(__dirname, "./en_US.dic"))
   },
-  en_CA: {
+  "en-CA": {
     affix: fs.readFileSync(path.resolve(__dirname, "./en_CA.aff")),
     dictionary: fs.readFileSync(path.resolve(__dirname, "./en_CA.dic"))
   },
-  en_GB: {
+  "en-GB": {
     affix: fs.readFileSync(path.resolve(__dirname, "./en_GB.aff")),
     dictionary: fs.readFileSync(path.resolve(__dirname, "./en_GB.dic"))
   },
