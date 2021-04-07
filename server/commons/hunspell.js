@@ -5,10 +5,10 @@ const dictionaries = require("../files/dictionaries");
 require("chromedriver");
 const {Builder, By} = require("selenium-webdriver");
 const chrome = require("selenium-webdriver/chrome");
-const driver = new Builder()
-  .forBrowser("chrome")
-  .setChromeOptions(new chrome.Options().addArguments("--headless"))
-  .build();
+
+const options = new chrome.Options();
+options.addArguments("--headless");
+options.addArguments("--log-level=3");
 
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
@@ -161,9 +161,21 @@ async function getHtml(site) {
 }
 
 async function getHtmlWebDriver(site) {
-  await driver.get(site);
-  const webElement = await driver.findElement(By.tagName("body"));
-  return await webElement.getText();
+  const driver = await new Builder()
+    .forBrowser("chrome")
+    .setChromeOptions(options)
+    .build();
+  try {
+    await driver.get(site);
+    const webElement = await driver.findElement(By.tagName("body"));
+    const output = await webElement.getAttribute("innerHTML");
+    return output;
+  } catch(err) {
+    throw new Error("Failed to resolve page");
+  } finally {
+    driver.close();
+    console.log("Finally block");
+  }
 }
 
 /**
@@ -295,6 +307,7 @@ async function getUrl(first, data, ws, dictionary, fast) {
       ws.close();
     }
 
+    // breaks loop if websocket close connection is recieved
     if (loop) {
       break;
     }

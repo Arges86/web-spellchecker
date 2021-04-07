@@ -24,8 +24,8 @@
               class="tooltiptext"
             >Check this to spell check each page on the site.</span>
           </label>
-          <label class="checkbox tooltip ml-5 has-text-left">
-            <input type="checkbox" id="checkbox" v-model="fast" />
+          <label class="checkbox tooltip ml-5 has-text-left" for="checkboxFast">
+            <input type="checkbox" id="checkboxFast" v-model="fast" />
             Search quickly?
             <br>
             <small>Turn off this option if initially it returns no results.</small>
