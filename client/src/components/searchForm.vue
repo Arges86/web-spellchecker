@@ -24,6 +24,15 @@
               class="tooltiptext"
             >Check this to spell check each page on the site.</span>
           </label>
+          <label class="checkbox tooltip ml-5 has-text-left">
+            <input type="checkbox" id="checkbox" v-model="fast" />
+            Search quickly?
+            <br>
+            <small>Turn off this option if initially it returns no results.</small>
+            <span
+              class="tooltiptext"
+            >Search with seleium, or via http.</span>
+          </label>
         </form>
         <div v-if="error" class="error has-text-danger">{{error}}</div>
       </div>
@@ -35,7 +44,6 @@
           <br>
           <b-message
             title="Warning"
-            
             aria-close-label="Close message"
           >When crawling domain this can take some time. <br> Sit back and relax.</b-message>
         </div>
@@ -54,6 +62,7 @@ export default class searchForm extends Vue {
   disabled = true; // enables submit button
   error = null; // displays input error message
   checked = false; // value of checkbox
+  fast = true; // if to search quickly or slowly
 
   @Prop() private isLoading: boolean;
 
@@ -67,16 +76,24 @@ export default class searchForm extends Vue {
   searchWeb() {
     this.$store.state.page = this.webSite;
     this.checkDomain();
+    this.getFast();
     return this.webSite;
   }
 
-  @Emit("domain:boolean") checkDomain() {
+  @Emit("domain:boolean")
+  checkDomain() {
     return this.checked;
   }
 
   @Emit("search:clear")
   clearPage(){
+    this.webSite = "";
     return true;
+  }
+
+  @Emit("fast:boolean")
+  getFast() {
+    return this.fast;
   }
 
   onSubmit() {

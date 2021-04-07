@@ -19,6 +19,7 @@
       @search:web="searchForText"
       @search:clear="clearPage"
       @domain:boolean="getChecked"
+      @fast:boolean="getFast"
       :isLoading="isLoading"
     />
     <pageResults :domain="domain" :results="text" :error="error" />
@@ -53,6 +54,7 @@ export default class Home extends Vue {
   conn = new WebSocket(process.env.VUE_APP_VUE_WEBSOCKET_API);
   list: lang[] = []; // list of dictionaries to use
   selected = null; // which dictionary language to use
+  fast = false; // if to search quickly or slowly
 
   created() {
     localStorage.setItem("webSocketStop", "false");
@@ -66,6 +68,7 @@ export default class Home extends Vue {
     this.domain = this.breakDownURL(data);
     this.$store.state.domain = this.domain;
     console.log(this.$store.state.domain);
+    console.log("fast search", this.fast);
 
     // if checking whole domain
     if (this.checked) {
@@ -76,6 +79,7 @@ export default class Home extends Vue {
         const params = {
           site: data,
           dictionary: this.selected,
+          fast: this.fast
         }
 
         conn.onopen = function (e) {
@@ -122,6 +126,7 @@ export default class Home extends Vue {
         params: {
           site: data,
           dictionary: this.selected,
+          fast: this.fast
         },
       };
 
@@ -168,8 +173,11 @@ export default class Home extends Vue {
   }
 
   getChecked(data: boolean) {
-    console.log("Is Checked ", data);
     this.checked = data;
+  }
+
+  getFast(data: boolean) {
+    this.fast = data;
   }
 
   /**

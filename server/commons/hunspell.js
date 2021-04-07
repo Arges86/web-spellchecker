@@ -2,6 +2,13 @@ const cheerio = require("cheerio");
 const axios = require("axios");
 const Nodehun = require("nodehun");
 const dictionaries = require("../files/dictionaries");
+require("chromedriver");
+const {Builder, By} = require("selenium-webdriver");
+const chrome = require("selenium-webdriver/chrome");
+const driver = new Builder()
+  .forBrowser("chrome")
+  .setChromeOptions(new chrome.Options().addArguments("--headless"))
+  .build();
 
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
@@ -9,13 +16,12 @@ const languages = Object.keys(dictionaries);
 console.log(languages);
 
 /**
- * 
+ * Get site information and return object
  * @param {string} site URL of webpage to search 
  * @param {string} dictionary Which dictionary to use
+ * @param {boolean} fast Choose to search with cheerio or webdriver. Defaults to false
  */
-async function getSite(site, dictionary) {
-
-  console.log(languages.includes(dictionary));
+async function getSite(site, dictionary, fast = false) {
 
   // if language isn't in list, throw error
   if (!languages.includes(dictionary)) {
@@ -29,9 +35,9 @@ async function getSite(site, dictionary) {
 
   const start = process.hrtime.bigint();
     
-  const html = await getHtml(site);
+  const html = fast ? await getHtml(site) : await getHtmlWebDriver(site);
 
-  let htmlData = html.data.replace(/>/g, "> ");  
+  let htmlData = html.replace(/>/g, "> "); 
   const $ = cheerio.load(htmlData);
 
   const pageText = getPageText($);
@@ -136,6 +142,7 @@ async function getHtml(site) {
   let html;
   try {
     html = await axios.get(site);
+
   } catch (error) {
     throw new Error("Failed to resolve page");
   }
@@ -150,7 +157,13 @@ async function getHtml(site) {
   if (html.request.res.responseUrl) {
     site = html.request.res.responseUrl;
   }
-  return html;
+  return html.data;
+}
+
+async function getHtmlWebDriver(site) {
+  await driver.get(site);
+  const webElement = await driver.findElement(By.tagName("body"));
+  return await webElement.getText();
 }
 
 /**
@@ -219,9 +232,10 @@ function getImages(site, $) {
  * @param {Array<string>} data List of all domains
  * @param {WebSocket} ws Websocket instance 
  * @param {string} dictionary Which dictionary to use
+ * @param {boolean} fast Choose to search with cheerio or webdriver
  * @returns 
  */
-async function getUrl(first, data, ws, dictionary) {
+async function getUrl(first, data, ws, dictionary, fast) {
   const URLs = new Set(data);
   // let URLs = new Array;
   // URLs = data;
@@ -249,7 +263,7 @@ async function getUrl(first, data, ws, dictionary) {
     i++;
     try {
 
-      const results = await getSite(url, dictionary);
+      const results = await getSite(url, dictionary, fast);
 
       // adds URL to outbound results object
       results.url = url;

@@ -41,16 +41,18 @@ wss.on("connection", (ws) => {
   
     let site = message.site;
     const dictionary = message.dictionary;
+    const fast = message.fast;
+
     site = site.replace(/['"]+/g, "");
     if (site.endsWith("/")) {
       site = message.substring(0, site.length - 1);
     }
 
-    hunspell.getSite(site, dictionary)
+    hunspell.getSite(site, dictionary, fast)
       .then(response => {
         response.url = site;
         ws.send(JSON.stringify(response));
-        hunspell.getUrl(site, response.links, ws, dictionary);
+        hunspell.getUrl(site, response.links, ws, dictionary, fast);
       })
       .catch(() => {
         ws.send(JSON.stringify({"Error": "Error resolving page"}));
