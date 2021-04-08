@@ -5,7 +5,7 @@ COPY package*.json ./
 RUN npm install --silent
 RUN npm install @vue/cli@3.9.0 -g
 COPY . /app
-RUN npm run build
+RUN npm run build:docker
 
 # production stage
 FROM nginx:stable-alpine as production-stage
