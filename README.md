@@ -16,6 +16,7 @@ web-spellchecker uses a number of open source projects to work properly:
 * [cheerio] - An implementation of core jQuery designed specifically for the server.
 * [axios] - Promise based HTTP client for the browser and node.js.
 * [ws] - WebSocket client and server implementation.
+* [hunspell] - A spell checker and morphological analyser designed for languages with rich morphology and complex word compounding and character encoding
 
 ### Installation Docker
 From the root project directory:
@@ -66,7 +67,6 @@ git push heroku master
 
  - Write MORE Tests
  - Add Themes
- - Allow as js script to be specified to run before collecting page data
 
 License
 ----
@@ -87,3 +87,4 @@ MIT
    [cheerio]: <https://www.npmjs.com/package/cheerio>
    [axios]: <https://www.npmjs.com/package/axios>
    [ws]: <https://www.npmjs.com/package/ws>
+   [hunspell]: <http://hunspell.github.io/>

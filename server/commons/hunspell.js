@@ -174,7 +174,6 @@ async function getHtmlWebDriver(site) {
     throw new Error("Failed to resolve page");
   } finally {
     driver.close();
-    console.log("Finally block");
   }
 }
 
@@ -253,8 +252,6 @@ async function getUrl(first, data, ws, dictionary, fast) {
   // URLs = data;
   URLs.delete(first);
 
-  // console.time("loop");
-
   if (data.length === 0) {
     ws.close();
     return;
@@ -266,7 +263,6 @@ async function getUrl(first, data, ws, dictionary, fast) {
 
   // gets domain of first URL
   const domain = breakDownURL(first);
-  // console.log(`Domain: ${domain}`);
 
   let i = 0;
   let loop = false;
@@ -288,7 +284,6 @@ async function getUrl(first, data, ws, dictionary, fast) {
           // if URL is not already on list
           if (!URLs.has(element)) {
             URLs.add(element);
-            // console.log(`Adding new element: ${element}`);
           }
         }
       });
@@ -302,8 +297,6 @@ async function getUrl(first, data, ws, dictionary, fast) {
 
     // if loop is done, close connection
     if (i === URLs.size) {
-      console.log("All Done!");
-      // console.timeEnd("loop");
       ws.close();
     }
 
