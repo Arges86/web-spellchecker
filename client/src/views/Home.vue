@@ -19,9 +19,15 @@
       @search:web="searchForText"
       @search:clear="clearPage"
       @domain:boolean="getChecked"
+      @fast:boolean="getFast"
       :isLoading="isLoading"
     />
     <pageResults :domain="domain" :results="text" :error="error" />
+
+    <div v-if="completed.length > 0" class="notification is-link float">
+      <button @click="completed = []" class="delete"></button>
+      Search has completed.
+    </div>
   </div>
 </template>
 
@@ -53,6 +59,8 @@ export default class Home extends Vue {
   conn = new WebSocket(process.env.VUE_APP_VUE_WEBSOCKET_API);
   list: lang[] = []; // list of dictionaries to use
   selected = null; // which dictionary language to use
+  fast = false; // if to search quickly or slowly
+  completed = []; // toggles the completed notification
 
   created() {
     localStorage.setItem("webSocketStop", "false");
@@ -66,6 +74,7 @@ export default class Home extends Vue {
     this.domain = this.breakDownURL(data);
     this.$store.state.domain = this.domain;
     console.log(this.$store.state.domain);
+    console.log("fast search", this.fast);
 
     // if checking whole domain
     if (this.checked) {
@@ -76,7 +85,8 @@ export default class Home extends Vue {
         const params = {
           site: data,
           dictionary: this.selected,
-        }
+          fast: this.fast,
+        };
 
         conn.onopen = function (e) {
           console.log("connection created");
@@ -85,6 +95,7 @@ export default class Home extends Vue {
 
         const tempArray = this.text;
         let wsError = this.error;
+        let wsComplete = this.completed;
         localStorage.setItem("webSocketStop", "false");
         conn.onmessage = function (event) {
           // console.log('Message received.');
@@ -111,6 +122,7 @@ export default class Home extends Vue {
 
         conn.onclose = function () {
           console.log("Connection Closed");
+          wsComplete.push({});
         };
       } else {
         console.error("Browser does not support Web Socket");
@@ -122,6 +134,7 @@ export default class Home extends Vue {
         params: {
           site: data,
           dictionary: this.selected,
+          fast: this.fast,
         },
       };
 
@@ -168,8 +181,11 @@ export default class Home extends Vue {
   }
 
   getChecked(data: boolean) {
-    console.log("Is Checked ", data);
     this.checked = data;
+  }
+
+  getFast(data: boolean) {
+    this.fast = data;
   }
 
   /**
@@ -197,3 +213,10 @@ export default class Home extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.float {
+  position: fixed !important;
+  bottom: 2rem;
+}
+</style>
