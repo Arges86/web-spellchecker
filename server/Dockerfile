@@ -1,4 +1,4 @@
-FROM node:12.6.0
+FROM node:14.16.0
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -15,5 +15,5 @@ RUN npm install --silent
 # Bundle app source
 COPY . .
 
-EXPOSE 8080
+EXPOSE 3000
 CMD [ "node", "./bin/www" ]
