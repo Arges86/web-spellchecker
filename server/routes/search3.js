@@ -9,7 +9,8 @@ process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 router.get("/", async function(req, res) {
 
   try {
-    const output = await site.getSite(req.query.site, req.query.dictionary);
+    const fast = req.query.fast !== "false";
+    const output = await site.getSite(req.query.site, req.query.dictionary, fast);
     res.send(output);
   } catch (error) {
     console.log(error);
