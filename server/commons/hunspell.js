@@ -64,6 +64,7 @@ async function getSite(site, dictionary, fast = false) {
     links: links,
     images: images,
     time: `${seconds} seconds`,
+    url: null
   };
 
 }
@@ -291,7 +292,7 @@ async function getUrl(first, data, ws, dictionary, fast) {
       ws.send(JSON.stringify(results));
 
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
 
 

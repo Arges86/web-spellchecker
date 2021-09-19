@@ -11,7 +11,7 @@ router.get("/", function(req, res) {
     url: req.query.site
   }); 
   extractor.analyze()
-    .then(function(text) {
+    .then(function(_text) {
       let html = extractor.html;
       const urls = html.match((/\bhttps?:\/\/\S+/gi));
 
