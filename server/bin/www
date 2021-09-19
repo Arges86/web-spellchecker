@@ -1,4 +1,10 @@
-#!/usr/bin/env node
+/**
+ * @typedef {Object} Message
+ * @property {string} site
+ * @property {string} dictionary
+ * @property {boolean} fast
+ */
+
 
 /**
  * Module dependencies.
@@ -34,18 +40,20 @@ const wss = new WebSocket.Server({ server });
 wss.on("connection", (ws) => {
 
   /**
- * Connections is up
- */
+  * Connections is up
+  */
   ws.on("message", (message) => {
-    message = JSON.parse(message);
-  
-    let site = message.site;
-    const dictionary = message.dictionary;
-    const fast = message.fast;
+
+    /** @type {Message} */
+    const parsed = JSON.parse(message);
+
+    let site = parsed.site;
+    const dictionary = parsed.dictionary;
+    const fast = parsed.fast;
 
     site = site.replace(/['"]+/g, "");
     if (site.endsWith("/")) {
-      site = message.substring(0, site.length - 1);
+      site = site.substring(0, site.length - 1);
     }
 
     hunspell.getSite(site, dictionary, fast)
@@ -55,7 +63,7 @@ wss.on("connection", (ws) => {
         hunspell.getUrl(site, response.links, ws, dictionary, fast);
       })
       .catch(() => {
-        ws.send(JSON.stringify({"Error": "Error resolving page"}));
+        ws.send(JSON.stringify({ "Error": "Error resolving page" }));
       });
   });
 
