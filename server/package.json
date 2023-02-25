@@ -9,7 +9,7 @@
     "lint": "eslint --fix --ignore-path .eslintignore ."
   },
   "engines": {
-    "node": "14.x"
+    "node": "16.19.x"
   },
   "dependencies": {
     "acorn": "^8.5.0",
