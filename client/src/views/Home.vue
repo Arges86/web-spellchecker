@@ -3,12 +3,17 @@
     <div class="columns">
       <div class="column is-half">
         Select dictionary language:
-        <select v-model="selected" class="select">
-          <option :disabled="true">Pick Language</option>
+        <select
+          v-model="selected"
+          class="select"
+        >
+          <option :disabled="true">
+            Pick Language
+          </option>
           <option
             v-for="option in list"
-            v-bind:value="option.value"
             :key="option.value"
+            :value="option.value"
           >
             {{ option.name }}
           </option>
@@ -16,23 +21,33 @@
       </div>
     </div>
     <searchForm
+      :is-loading="isLoading"
       @search:web="searchForText"
       @search:clear="clearPage"
       @domain:boolean="getChecked"
       @fast:boolean="getFast"
-      :isLoading="isLoading"
     />
-    <pageResults :domain="domain" :results="text" :error="error" />
+    <pageResults
+      :domain="domain"
+      :results="text"
+      :error="error"
+    />
 
-    <div v-if="completed.length > 0" class="notification is-link float">
-      <button @click="completed = []" class="delete"></button>
+    <div
+      v-if="completed.length > 0"
+      class="notification is-link float"
+    >
+      <button
+        class="delete"
+        @click="completed = []"
+      />
       Search has completed.
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
 import searchForm from "../components/searchForm.vue";
 import pageResults from "../components/pageResults.vue";
 // import { WebSocket } from 'ws';
@@ -51,12 +66,11 @@ interface lang {
   },
 })
 export default class Home extends Vue {
-  private text = []; // whole object getting sent to component
-  private isLoading = false; // loading boolean
-  private domain = ""; // domain of website being searched
-  private error = []; // if error getting returned
-  private checked: boolean; // if check box is check to search whole domain
-  conn = new WebSocket(process.env.VUE_APP_VUE_WEBSOCKET_API);
+  text = []; // whole object getting sent to component
+  isLoading = false; // loading boolean
+  domain = ""; // domain of website being searched
+  error = []; // if error getting returned
+  checked: boolean; // if check box is check to search whole domain
   list: lang[] = []; // list of dictionaries to use
   selected = null; // which dictionary language to use
   fast = false; // if to search quickly or slowly
@@ -80,7 +94,13 @@ export default class Home extends Vue {
     if (this.checked) {
       console.log("Checking domain...");
       if ("WebSocket" in window) {
-        const conn = new WebSocket(process.env.VUE_APP_VUE_WEBSOCKET_API);
+        const conn = new WebSocket(
+          process.env.VUE_APP_ENV == "prod"
+            ? `${this.getWebSocket(location.protocol)}//${
+              location.hostname
+            }:3030/`
+            : process.env.VUE_APP_VUE_WEBSOCKET_API
+        );
 
         const params = {
           site: data,
@@ -88,7 +108,7 @@ export default class Home extends Vue {
           fast: this.fast,
         };
 
-        conn.onopen = function (e) {
+        conn.onopen = function () {
           console.log("connection created");
           conn.send(JSON.stringify(params));
         };
@@ -138,7 +158,7 @@ export default class Home extends Vue {
         },
       };
 
-      HTTP.get(`/v3/search`, request)
+      HTTP.get("/v3/search", request)
         .then((response) => {
           this.isLoading = false;
 
@@ -168,7 +188,7 @@ export default class Home extends Vue {
     this.selected = filtered[0].value;
   }
 
-  checkStatus(conn) {
+  checkStatus(conn: WebSocket) {
     if (this.$store.state.stop) {
       console.log("Stopping search ", this.$store.state.stop);
       conn.close();
@@ -210,6 +230,18 @@ export default class Home extends Vue {
     domain = url.split("/")[0].split(".")[0];
 
     return domain;
+  }
+
+  /** Gets websocket protocol based off of http protocol */
+  private getWebSocket(protocol: string): "ws:" | "wss:" {
+    switch (protocol) {
+    case "http:":
+      return "ws:";
+    case "https:":
+      return "wss:";
+    default:
+      return "ws:";
+    }
   }
 }
 </script>
