@@ -1,31 +1,68 @@
 <template>
   <section>
-    <b-loading :is-full-page="false" :active.sync="isLoading"></b-loading>
+    <b-loading
+      :is-full-page="false"
+      :active.sync="isLoading"
+    />
     <div class="columns">
       <div class="column is-half">
         <form
-          v-on:keyup.enter="onSubmit"
-          v-on:keyup="validateForm"
-          v-on:paste="validateForm"
-          v-on:submit.prevent
+          @keyup.enter="onSubmit"
+          @keyup="validateForm"
+          @paste="validateForm"
+          @submit.prevent
         >
           <b-field label="Website">
-            <b-input v-model="webSite" placeholder="https://example.com"></b-input>
+            <b-input
+              v-model="webSite"
+              placeholder="https://example.com"
+            />
           </b-field>
           <div class="buttons has-addons">
-            <b-button rounded @click="onSubmit" type="is-black" :disabled="disabled || isLoading">Search </b-button>
-            <b-button v-if="checked" rounded @click="stopSearch" type="is-primary">Stop </b-button>
-            <b-button rounded @click="clearPage" type="is-warning">Clear</b-button>
+            <b-button
+              rounded
+              type="is-black"
+              :disabled="disabled || isLoading"
+              @click="onSubmit"
+            >
+              Search
+            </b-button>
+            <b-button
+              v-if="checked"
+              rounded
+              type="is-primary"
+              @click="stopSearch"
+            >
+              Stop
+            </b-button>
+            <b-button
+              rounded
+              type="is-warning"
+              @click="clearPage"
+            >
+              Clear
+            </b-button>
           </div>
           <label class="checkbox tooltip">
-            <input type="checkbox" id="checkbox" v-model="checked" />
+            <input
+              id="checkbox"
+              v-model="checked"
+              type="checkbox"
+            >
             Check whole domain?
             <span
               class="tooltiptext"
             >Check this to spell check each page on the site.</span>
           </label>
-          <label class="checkbox tooltip ml-5 has-text-left" for="checkboxFast">
-            <input type="checkbox" id="checkboxFast" v-model="fast" />
+          <label
+            class="checkbox tooltip ml-5 has-text-left"
+            for="checkboxFast"
+          >
+            <input
+              id="checkboxFast"
+              v-model="fast"
+              type="checkbox"
+            >
             Search quickly?
             <br>
             <small>Turn off this option if initially it returns no results.</small>
@@ -34,7 +71,12 @@
             >Search with seleium, or via http.</span>
           </label>
         </form>
-        <div v-if="error" class="error has-text-danger">{{error}}</div>
+        <div
+          v-if="error"
+          class="error has-text-danger"
+        >
+          {{ error }}
+        </div>
       </div>
       <div class="column">
         Welcome!
@@ -45,7 +87,9 @@
           <b-message
             title="Warning"
             aria-close-label="Close message"
-          >When crawling domain this can take some time. <br> Sit back and relax.</b-message>
+          >
+            When crawling domain this can take some time. <br> Sit back and relax.
+          </b-message>
         </div>
       </div>
     </div>
@@ -54,7 +98,6 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Emit } from "vue-property-decorator";
-import { mapGetters } from "vuex";
 
 @Component
 export default class searchForm extends Vue {
@@ -103,6 +146,7 @@ export default class searchForm extends Vue {
       this.disabled = true;
     } else {
       if (regEx.test(this.webSite)) {
+        // do nothing
       } else {
         this.webSite = `http://${this.webSite}`;
       }

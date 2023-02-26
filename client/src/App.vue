@@ -1,13 +1,19 @@
 <template>
-  <div  id="app">
+  <div id="app">
     <!-- <a href="https://github.com/Arges86/web-spellchecker" target="_blank"><img width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_orange_ff7600.png?resize=149%2C149" class="attachment" alt="Fork me on GitHub" data-recalc-dims="1"></a> -->
     <div id="nav">
-      <router-link to="/">Home</router-link>
-      <router-link to="/about">About</router-link>
+      <router-link to="/">
+        Home
+      </router-link>
+      <router-link to="/about">
+        About
+      </router-link>
     </div>
     <div class="container">
-      <div class="title">Website Spell Checker</div>
-      <router-view/>
+      <div class="title">
+        Website Spell Checker
+      </div>
+      <router-view />
     </div>
   </div>
 </template>
