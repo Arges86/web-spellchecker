@@ -6,11 +6,11 @@ services:
         build: ./server
         container_name: speller-app
         ports: 
-            - 3000:3000
+            - 3030:3000
     
     #frontend
     vuejs:
         build: ./client
         container_name: speller-ui
         ports: 
-            - 80:80
+            - 8080:80

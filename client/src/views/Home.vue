@@ -51,12 +51,11 @@ interface lang {
   },
 })
 export default class Home extends Vue {
-  private text = []; // whole object getting sent to component
-  private isLoading = false; // loading boolean
-  private domain = ""; // domain of website being searched
-  private error = []; // if error getting returned
-  private checked: boolean; // if check box is check to search whole domain
-  conn = new WebSocket(process.env.VUE_APP_VUE_WEBSOCKET_API);
+  text = []; // whole object getting sent to component
+  isLoading = false; // loading boolean
+  domain = ""; // domain of website being searched
+  error = []; // if error getting returned
+  checked: boolean; // if check box is check to search whole domain
   list: lang[] = []; // list of dictionaries to use
   selected = null; // which dictionary language to use
   fast = false; // if to search quickly or slowly
@@ -80,7 +79,13 @@ export default class Home extends Vue {
     if (this.checked) {
       console.log("Checking domain...");
       if ("WebSocket" in window) {
-        const conn = new WebSocket(process.env.VUE_APP_VUE_WEBSOCKET_API);
+        const conn = new WebSocket(
+          process.env.VUE_APP_ENV == "prod"
+            ? `${this.getWebSocket(location.protocol)}//${
+                location.hostname
+              }:3030/`
+            : process.env.VUE_APP_VUE_WEBSOCKET_API
+        );
 
         const params = {
           site: data,
@@ -168,7 +173,7 @@ export default class Home extends Vue {
     this.selected = filtered[0].value;
   }
 
-  checkStatus(conn) {
+  checkStatus(conn: WebSocket) {
     if (this.$store.state.stop) {
       console.log("Stopping search ", this.$store.state.stop);
       conn.close();
@@ -210,6 +215,18 @@ export default class Home extends Vue {
     domain = url.split("/")[0].split(".")[0];
 
     return domain;
+  }
+
+  /** Gets websocket protocol based off of http protocol */
+  private getWebSocket(protocol: string): "ws:" | "wss:" {
+    switch (protocol) {
+      case "http:":
+        return "ws:";
+      case "https:":
+        return "wss:";
+      default:
+        return "ws:";
+    }
   }
 }
 </script>
