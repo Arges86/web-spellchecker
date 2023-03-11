@@ -9,6 +9,7 @@ const chrome = require("selenium-webdriver/chrome");
 const options = new chrome.Options();
 options.addArguments("--headless");
 options.addArguments("--log-level=3");
+options.addArguments("--no-sandbox");
 
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
